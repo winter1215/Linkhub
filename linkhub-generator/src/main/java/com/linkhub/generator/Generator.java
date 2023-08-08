@@ -1,10 +1,13 @@
 package com.linkhub.generator;
+import com.baomidou.mybatisplus.annotation.FieldFill;
+import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.core.exceptions.MybatisPlusException;
 import com.baomidou.mybatisplus.core.toolkit.StringPool;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.generator.AutoGenerator;
 import com.baomidou.mybatisplus.generator.InjectionConfig;
 import com.baomidou.mybatisplus.generator.config.*;
+import com.baomidou.mybatisplus.generator.config.po.TableFill;
 import com.baomidou.mybatisplus.generator.config.po.TableInfo;
 import com.baomidou.mybatisplus.generator.config.rules.NamingStrategy;
 import com.baomidou.mybatisplus.generator.engine.FreemarkerTemplateEngine;
@@ -39,19 +42,20 @@ public class Generator {
         // 全局配置
         GlobalConfig gc = new GlobalConfig();
         String projectPath = System.getProperty("user.dir");
-        final String portalPutPath = projectPath + "/linkhub-portal";
+        final String portalPutPath = projectPath + "/linkhub-generator";
         final String generalPutDir = "/src/main/java";
         gc.setOutputDir(portalPutPath + generalPutDir);    //此处修改要生成的数据所在位置(相对于项目根路径)
-        gc.setAuthor("CYY&winter"); //作者
+        gc.setAuthor("ku&winter"); //作者
         gc.setOpen(false); //是否打开目录
         gc.setBaseResultMap(true);//xml开启BaseResultMap
         gc.setBaseColumnList(true);//xml 开启BaseColumn
         gc.setSwagger2(true); //实体属性 Swagger2 注解
+        gc.setIdType(IdType.ASSIGN_UUID);
         mpg.setGlobalConfig(gc);
 
         // 数据源配置
         DataSourceConfig dsc = new DataSourceConfig();
-        dsc.setUrl("jdbc:mysql://localhost:3306/tower?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai");
+        dsc.setUrl("jdbc:mysql://localhost:3306/linkhub?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai");
         // dsc.setSchemaName("public");
         dsc.setDriverName("com.mysql.cj.jdbc.Driver");
         dsc.setUsername("root");
@@ -61,9 +65,8 @@ public class Generator {
 
         // 包配置
         PackageConfig pc = new PackageConfig();
-        pc.setParent("com.linkhub.portal")
+        pc.setParent("com.linkhub.tmp")
                 .setEntity("pojo")
-                //.setEntity("pojo.bot")
                 .setMapper("mapper")
                 .setService("service")
                 .setServiceImpl("service.impl")
@@ -116,6 +119,12 @@ public class Generator {
         strategy.setRestControllerStyle(true);
         strategy.setInclude(scanner("表名，多个英文逗号分割").split(","));
         strategy.setControllerMappingHyphenStyle(true);
+        // 自动填充
+        ArrayList<TableFill> tableFills = new ArrayList<>();
+        tableFills.add(new TableFill("create_time", FieldFill.INSERT));
+        tableFills.add(new TableFill("updateTime", FieldFill.INSERT_UPDATE));
+        strategy.setTableFillList(tableFills);
+
         //表前缀
 //        strategy.setTablePrefix("t_");
         mpg.setStrategy(strategy);

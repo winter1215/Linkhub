@@ -11,9 +11,9 @@ spring:
   #数据库配置
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://47.108.28.138:3306/tower?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai #47.108.28.138
-    username: tower #tower
-    password: bM2xRTPWn3jk4JMr #bM2xRTPWn3jk4JMr
+    url: jdbc:mysql://localhost:3306/linkhub?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai #47.108.28.138
+    username: root
+    password: winter
   # redis 的配置
   redis:
     host: 127.0.0.1
@@ -65,14 +65,6 @@ secure:
       - /user/login
       - /user/forget
       - /im/**
-      # 文章相关
-      - /post/get
-      - /post/page
-      - /bbs-post/latest
-      # 评论相关
-      - /comment/list
-      - /comment/childList
-
 jwt:
   tokenHeader: Authorization #jwt请求头
   secret: tower-portal #盐

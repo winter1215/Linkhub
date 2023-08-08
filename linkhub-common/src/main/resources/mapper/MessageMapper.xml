@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.linkhub.common.mapper.MessageMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.linkhub.common.model.pojo.Message">
+        <id column="id" property="id" />
+        <result column="content" property="content" />
+        <result column="author" property="author" />
+        <result column="converse_id" property="converseId" />
+        <result column="has_recall" property="hasRecall" />
+        <result column="reply_id" property="replyId" />
+        <result column="reply_content" property="replyContent" />
+        <result column="reply_author" property="replyAuthor" />
+        <result column="group_id" property="groupId" />
+        <result column="createAt" property="createAt" />
+        <result column="updateAt" property="updateAt" />
+    </resultMap>
+
+    <resultMap id="MsgVoMap" type="com.linkhub.common.model.vo.MessageVo">
+        <id column="id" property="id" />
+        <result column="content" property="content" />
+        <result column="msgAuthor" property="author" />
+        <result column="converse_id" property="converseId" />
+        <result column="has_recall" property="hasRecall" />
+        <result column="reply_id" property="replyId" />
+        <result column="reply_content" property="replyContent" />
+        <result column="reply_author" property="replyAuthor" />
+        <result column="group_id" property="groupId" />
+        <result column="createAt" property="createAt" />
+        <result column="updateAt" property="updateAt" />
+        <collection property="reactions" ofType="com.linkhub.common.model.pojo.Reaction">
+            <result column="name" property="name"/>
+            <result column="reactionAuthor" property="author"/>
+        </collection>
+
+        <collection property="mentions" ofType="String" column="mention" javaType="java.util.List">
+            <result property="" column="mention"/>
+        </collection>
+
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, content, author, converse_id, has_recall, reply_id, reply_content, reply_author, group_id, createAt, updateAt
+    </sql>
+
+    <select id="findOneById" resultMap="MsgVoMap">
+        select m.id, content, m.author as msgAuthor, mr.author as reactionAuthor, converse_id, has_recall, reply_id, reply_content, reply_author, group_id,
+               mr.name, mr.mention
+        from message m left join msg_extra mr on m.id = mr.msg_id where m.id = #{id}
+    </select>
+
+</mapper>

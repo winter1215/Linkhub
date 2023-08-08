@@ -45,6 +45,7 @@ public class LinkhubUserDetails implements UserDetails {
      * 账号是否被封禁
      */
     @Override
+    // todo: 修改
     public boolean isAccountNonLocked() {
         return AuthStatus.USER_BANNED.getCode() != user.getStatus();
     }
