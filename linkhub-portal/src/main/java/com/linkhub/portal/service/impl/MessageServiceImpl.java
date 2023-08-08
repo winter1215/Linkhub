@@ -2,8 +2,8 @@ package com.linkhub.portal.service.impl;
 
 import com.linkhub.common.mapper.MessageMapper;
 import com.linkhub.common.model.pojo.Message;
-import com.linkhub.portal.service.IMessageService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.linkhub.portal.service.IMessageService;
 import org.springframework.stereotype.Service;
 
 /**

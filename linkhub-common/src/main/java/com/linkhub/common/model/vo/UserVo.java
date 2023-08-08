@@ -10,10 +10,6 @@ import lombok.Data;
 public class UserVo {
     Long id;
     String nickname;
-    String username;
+    String email;
     String avatar;
-    Integer gender;
-    String introduction;
-    Boolean status;
-    // todo： 脱敏后需要多少属性
 }

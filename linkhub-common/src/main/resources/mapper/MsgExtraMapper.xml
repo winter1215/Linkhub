@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.linkhub.portal.mapper.MsgReactionMapper">
+<mapper namespace="com.linkhub.common.mapper.MsgExtraMapper">
 
     <!-- 通用查询映射结果 -->
-    <resultMap id="BaseResultMap" type="com.linkhub.portal.pojo.MsgReaction">
+    <resultMap id="BaseResultMap" type="com.linkhub.common.model.pojo.MsgExtra">
         <result column="id" property="id" />
         <result column="msg_id" property="msgId" />
         <result column="name" property="name" />
