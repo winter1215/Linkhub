@@ -1,0 +1,94 @@
+server:
+  port: 8080
+
+# knife 增强模式
+knife4j:
+  enable: true
+spring:
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
+  #数据库配置
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://47.108.28.138:3306/tower?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai #47.108.28.138
+    username: tower #tower
+    password: bM2xRTPWn3jk4JMr #bM2xRTPWn3jk4JMr
+  # redis 的配置
+  redis:
+    host: 127.0.0.1
+    port: 6379
+    database: 0
+    # 连接超时时长
+    connect-timeout: 1800000
+    lettuce:
+      pool:
+        max-active: 20
+        # 连接池中没有连接可用时，最长等待多久
+        max-wait: 1
+        #最大阻塞等待时间(负数表示没限制)
+        max-idle: 5
+        min-idle: 0
+    password: root
+  # 发送邮箱配置
+  mail:
+    host: smtp.qq.com
+    port: 465
+    username: 2436197699@qq.com
+    password: gidsetgzluosdjei # 授权码
+    properties:
+      mail:
+        smtp:
+          ssl:
+            enable: true
+mybatis-plus:
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+
+
+secure:
+  ignored:
+    urls: #安全路径白名单
+      - /doc.html
+      - /swagger-ui/
+      - /swagger-resources/**
+      - /**/v2/api-docs
+      - /**/v3/api-docs
+      - /**/*.html
+      - /**/*.js
+      - /**/*.css
+      - /**/*.png
+      - /**/*.map
+      - /favicon.ico
+      - /user/register
+      - /user/code/**
+      - /user/login
+      - /user/forget
+      - /im/**
+      # 文章相关
+      - /post/get
+      - /post/page
+      - /bbs-post/latest
+      # 评论相关
+      - /comment/list
+      - /comment/childList
+
+jwt:
+  tokenHeader: Authorization #jwt请求头
+  secret: tower-portal #盐
+  expiration: 604800  #token失效时间(默认一周)
+  tokenHead: 'Bearer ' #负载头
+
+redis:
+  key:
+    user: 'activity:user' #活跃的用户
+    category: 'activity:category' #各模块类别
+  expire:
+    common: 86400 #默认key24小时过期
+    viewed: 3600 #同一帖子同一用户一小时内是否浏览过
+
+
+oos:
+  accessKey: 9EsxpmzKyHtzgXu3YMoUgcX1zehOPYe5BxNOCzsw
+  secretKey: b0wiyZRPagByg2U7q1ZjcNcGtiITbsj-tpIhKeZI
+  bucket: winter-tower

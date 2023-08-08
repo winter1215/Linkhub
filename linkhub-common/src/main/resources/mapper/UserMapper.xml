@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.linkhub.common.mapper.UserMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.linkhub.common.model.pojo.User">
+        <id column="id" property="id" />
+        <result column="nickname" property="nickname" />
+        <result column="username" property="username" />
+        <result column="password" property="password" />
+        <result column="avatar" property="avatar" />
+        <result column="introduction" property="introduction" />
+        <result column="status" property="status" />
+        <result column="student_no" property="studentNo" />
+        <result column="real_name" property="realName" />
+        <result column="gender" property="gender" />
+        <result column="mail" property="mail" />
+        <result column="banned_count" property="bannedCount" />
+        <result column="banned_begin" property="bannedBegin" />
+        <result column="banned_end" property="bannedEnd" />
+        <result column="update_time" property="updateTime" />
+        <result column="create_time" property="createTime" />
+        <result column="is_delete" property="isDelete" />
+    </resultMap>
+
+<!--  通用的 userVoResultMap, 使用时注意设置列的别名  -->
+    <resultMap id="CommonUserVoResultMap" type="com.linkhub.common.model.vo.UserVo">
+        <id column="u_id" property="id" />
+        <result column="u_nickname" property="nickname" />
+        <result column="u_username" property="username" />
+        <result column="u_avatar" property="avatar" />
+        <result column="u_introduction" property="introduction" />
+        <result column="u_status" property="status" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, nickname, username, password, avatar, introduction, status, student_no, real_name, gender, mail, banned_count, banned_begin, banned_end, update_time, create_time, is_delete
+    </sql>
+
+    <select id="selectUserByUsername" resultMap="BaseResultMap">
+        SELECT
+            id,
+            nickname,
+            username,
+            `password`,
+            avatar,
+            introduction,
+            `status`,
+            student_no,
+            real_name,
+            gender,
+            mail,
+            banned_count,
+            banned_begin,
+            banned_end,
+            update_time,
+            create_time,
+            is_delete
+        FROM
+            `user`
+        WHERE
+            `user`.username = #{username} AND is_delete = 0
+    </select>
+
+    <select id="selectUserByMail" resultMap="BaseResultMap">
+        SELECT
+            id,
+            nickname,
+            username,
+            `password`,
+            avatar,
+            introduction,
+            `status`,
+            student_no,
+            real_name,
+            gender,
+            mail,
+            banned_count,
+            banned_begin,
+            banned_end,
+            update_time,
+            create_time,
+            is_delete
+        FROM
+            `user`
+        WHERE
+            `user`.mail = #{email} AND is_delete = 0
+    </select>
+
+</mapper>
