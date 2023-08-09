@@ -47,12 +47,12 @@ public interface IUserService extends IService<User> {
     /**
      * 忘记密码，验证验证码是否正确，再通过邮箱获取对应用户更改其密码
      *
-     * @param code 验证码
+     * @param otp 验证码
      * @param email 邮箱
      * @param password 新密码
      * @return 是否成功
      */
-    R forgetPassword(String code, String email, String password);
+    R forgetPassword(String otp, String email, String password);
 
     /**
      * 更新用户密码

@@ -15,12 +15,12 @@ import javax.validation.constraints.NotNull;
 public class ForgetPassForm {
     @NotNull(message = "邮箱不能为空")
     @Email(message = "邮箱不合法")
-    private String Email;
+    private String email;
 
     @NotNull(message = "新密码不能为空")
-    private String newPassword;
+    private String password;
 
     @NotNull(message = "验证码不能为空")
     @Length(min = 4, max = 4)
-    private String code;
+    private String otp;
 }
