@@ -29,13 +29,12 @@ spring:
         #最大阻塞等待时间(负数表示没限制)
         max-idle: 5
         min-idle: 0
-    password: root
   # 发送邮箱配置
   mail:
     host: smtp.qq.com
     port: 465
     username: 2436197699@qq.com
-    password: gidsetgzluosdjei # 授权码
+    password: ejfxnbokkbkadibe # 授权码
     properties:
       mail:
         smtp:

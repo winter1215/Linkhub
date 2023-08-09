@@ -57,7 +57,7 @@ public class UserController {
     @ApiOperation("用户登录")
     @PostMapping("/login")
     public R login(@RequestBody @Validated LoginForm loginForm){
-        String token = userService.login(loginForm.getUsername(), loginForm.getPassword());
+        String token = userService.login(loginForm.getEmail(), loginForm.getPassword());
         return R.ok()
                 .data("token",token)
                 .data("tokenHead",tokenHead);

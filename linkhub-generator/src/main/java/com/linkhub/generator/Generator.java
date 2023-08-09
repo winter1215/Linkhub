@@ -121,8 +121,8 @@ public class Generator {
         strategy.setControllerMappingHyphenStyle(true);
         // 自动填充
         ArrayList<TableFill> tableFills = new ArrayList<>();
-        tableFills.add(new TableFill("create_time", FieldFill.INSERT));
-        tableFills.add(new TableFill("updateTime", FieldFill.INSERT_UPDATE));
+        tableFills.add(new TableFill("create_at", FieldFill.INSERT));
+        tableFills.add(new TableFill("update_at", FieldFill.INSERT_UPDATE));
         strategy.setTableFillList(tableFills);
 
         //表前缀

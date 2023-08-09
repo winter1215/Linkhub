@@ -35,7 +35,7 @@ public class UserCacheService implements IUserCacheService {
 
     @Override
     public void setUser(User user) {
-        String key = REDIS_KEY_USER+":"+user.getUsername();
+        String key = REDIS_KEY_USER+":"+user.getEmail();
         redisCache.setCacheObject(key,user,REDIS_EXPIRE, TimeUnit.SECONDS);
     }
 }

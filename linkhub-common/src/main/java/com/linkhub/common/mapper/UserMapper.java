@@ -17,7 +17,7 @@ public interface UserMapper extends BaseMapper<User> {
      * @param username 用户名
      * @return 用户，未找到或者被删除返回null
      */
-    User selectUserByUsername(String username);
+    //User selectUserByNickname(String username);
 
     /**
      * 通过邮箱获取用户

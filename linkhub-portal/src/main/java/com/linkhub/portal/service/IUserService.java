@@ -22,7 +22,7 @@ public interface IUserService extends IService<User> {
      * 用户登录
      * @return 登录成功返回token失败抛出异常交于GlobalExceptionHandler统一发送error消息
      */
-    String login(String username, String password);
+    String login(String email, String password);
 
     /**
      * 通过用户名获取user对象(实现UserDetails的对象)

@@ -21,7 +21,7 @@ public class PortalSecurityConfig {
      */
     @Bean
     public UserDetailsService userDetailsService(){
-        return username -> userService.loadUserByUsername(username);
+        return email -> userService.loadUserByUsername(email);
     }
 
 }

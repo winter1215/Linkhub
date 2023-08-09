@@ -31,9 +31,12 @@ public class LinkhubUserDetails implements UserDetails {
         return user.getPassword();
     }
 
+    /**
+    * 邮箱是唯一的
+    */
     @Override
     public String getUsername() {
-        return user.getUsername();
+        return user.getEmail();
     }
 
     @Override
@@ -45,9 +48,8 @@ public class LinkhubUserDetails implements UserDetails {
      * 账号是否被封禁
      */
     @Override
-    // todo: 修改
     public boolean isAccountNonLocked() {
-        return AuthStatus.USER_BANNED.getCode() != user.getStatus();
+        return user.getBanned();
     }
 
     @Override

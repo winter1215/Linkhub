@@ -1,22 +1,28 @@
 package com.linkhub.portal.service.impl;
 
+import cn.hutool.core.util.RandomUtil;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.linkhub.common.config.exception.GlobalException;
 import com.linkhub.common.config.redis.RedisCache;
 import com.linkhub.common.enums.AuthStatus;
 import com.linkhub.common.enums.ErrorCode;
 import com.linkhub.common.enums.RedisPrefix;
+import com.linkhub.common.mapper.UserSettingMapper;
 import com.linkhub.common.model.dto.UpdateUserDto;
 import com.linkhub.common.model.pojo.User;
 import com.linkhub.common.mapper.UserMapper;
+import com.linkhub.common.model.pojo.UserSetting;
 import com.linkhub.common.utils.R;
 import com.linkhub.common.model.dto.RegisterUser;
 import com.linkhub.portal.security.LinkhubUserDetails;
 import com.linkhub.portal.service.IUserCacheService;
 import com.linkhub.portal.service.IUserService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.linkhub.portal.service.IUserSettingService;
 import com.linkhub.security.util.JwtTokenUtil;
 import com.linkhub.security.util.SecurityUtils;
+import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -27,6 +33,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 
@@ -49,54 +56,77 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
     private UserMapper userMapper;
 
     @Autowired
+    private UserSettingMapper userSettingMapper;
+
+    @Autowired
     private IUserCacheService userCacheService;
     @Autowired
     private JwtTokenUtil jwtTokenUtil;
 
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public int register(RegisterUser registerUser) {
-        String username = registerUser.getUsername();
-        String mail = registerUser.getMail();
-        User user;
-        // 检查用户名是否存在
-        user = baseMapper.selectOne(new QueryWrapper<User>().eq("username", username));
-        if(user != null) {
-            throw new GlobalException("用户已存在", ErrorCode.PARAMS_ERROR.getCode());
-        }
-        // 检查邮箱是否重复
-        user = baseMapper.selectOne(new QueryWrapper<User>().eq("mail", mail));
-        if (user != null) {
-            throw new GlobalException("邮箱已存在", ErrorCode.PARAMS_ERROR.getCode());
-        }
-        // 获取验证码
-        String code = redisCache.getCacheObject(String.format(RedisPrefix.PREFIX_VERIFY_CODE, mail));
-        if (code == null) {
-            throw new GlobalException("请先获取验证码", ErrorCode.PARAMS_ERROR.getCode());
-        }
-        if(!code.equals(registerUser.getCode())) {
-            throw new GlobalException("验证码有误", ErrorCode.PARAMS_ERROR.getCode());
-        }
-        // 验证成功后删除缓存中的验证码
-        redisCache.deleteObject(String.format(RedisPrefix.PREFIX_VERIFY_CODE, mail));
-        User newUser = new User();
-        BeanUtils.copyProperties(registerUser, newUser);
-        // 加密密码
-        newUser.setPassword(passwordEncoder.encode(newUser.getPassword()));
+        String nickname = registerUser.getNickname();
+        String email = registerUser.getEmail();
 
-        return baseMapper.insert(newUser);
+        // check if mail is unique
+        User user = baseMapper.selectUserByMail(email);
+        if (ObjectUtils.isNotEmpty(user)) {
+            throw new GlobalException(ErrorCode.PARAMS_ERROR, "该邮箱已被注册");
+        }
+
+        // todo: verify mail
+        User newUser = new User();
+        String discriminator = generateDiscriminator(nickname, 10);
+        BeanUtils.copyProperties(registerUser, newUser);
+        newUser.setDiscriminator(discriminator);
+        // encrypt pwd
+        newUser.setPassword(passwordEncoder.encode(newUser.getPassword()));
+        baseMapper.insert(newUser);
+        // insert userSetting record
+        UserSetting userSetting = new UserSetting();
+        userSetting.setUserId(newUser.getId());
+        return userSettingMapper.insert(userSetting);
     }
+
+
+    /**
+     * 生成数据库唯一的 nickname 对应的随机数 discriminator
+     * @param nickname:
+     * @return: java.lang.String
+     * @author: winter
+     * @date: 2023/8/9 下午5:43
+     * @description:
+     */
+    private String generateDiscriminator(String nickname, int restTimes) {
+        if (restTimes <= 0) {
+            throw new GlobalException(ErrorCode.OPERATION_ERROR, "为当前用户分配随机码失败，请多次重试");
+        }
+        // generate 4-bit random numbers of string type
+        String discriminator = RandomUtil.randomNumbers(4);
+        // check if discriminator is unique
+        LambdaQueryWrapper<User> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(User::getNickname, nickname);
+        wrapper.eq(User::getDiscriminator, discriminator);
+        User user = baseMapper.selectOne(wrapper);
+        if (ObjectUtils.isNotEmpty(user)) {
+            return generateDiscriminator(nickname, --restTimes);
+        }
+        return discriminator;
+    }
+
     /**
      * 用户登录
      * @return 登录成功返回token失败抛出异常交于GlobalExceptionHandler统一发送error消息
      *
      */
     @Override
-    public String login(String username, String password) {
+    public String login(String email, String password) {
         try {
-            UserDetails userDetails = loadUserByUsername(username);
+            UserDetails userDetails = loadUserByUsername(email);
             if(!passwordEncoder.matches(password,userDetails.getPassword())){
-                throw new BadCredentialsException("用户名或密码不正确");
+                throw new BadCredentialsException("邮箱或密码不正确");
             }
             UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
             SecurityContextHolder.getContext().setAuthentication(authToken);
@@ -108,31 +138,25 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
 
     /**
      * 通过用户名获取user对象(实现UserDetails的对象)，更新user的禁言状态
-     * @param username 用户名
+     * @param email 用户名(邮箱)
      * @return 不存在user抛出springSecurity的内置异常UsernameNotFoundException,反之返回对象
      */
     @Override
-    public UserDetails loadUserByUsername(String username) {
-        User user = getUserByUsername(username);
+    public UserDetails loadUserByUsername(String email) {
+        User user = getUserByUsername(email);
         if(user == null) throw new UsernameNotFoundException(ErrorCode.USERNAME_PASSWORD_ERROR.getMessage());
-        LocalDateTime now = LocalDateTime.now();
-        if(AuthStatus.USER_RESTRICT.getCode() == user.getStatus() && now.isAfter(user.getBannedEnd())){
-            //更新状态
-            user.setStatus(AuthStatus.OK.getCode());
-            updateUser(user);
-        }
         return new LinkhubUserDetails(user);
     }
     /**
      * 通过用户名从redis或者数据库获取用户，redis不存在会从数据库查询并将结果存入redis如果数据库中不存在则返回null
-     * @param username 用户名
+     * @param email 用户名
      * @return 用户对象或者null
      */
     @Override
-    public User getUserByUsername(String username) {
-        User user = userCacheService.getUserByUsername(username);
+    public User getUserByUsername(String email) {
+        User user = userCacheService.getUserByUsername(email);
         if(user == null){
-            user = userMapper.selectUserByUsername(username);
+            user = userMapper.selectUserByMail(email);
             if(user != null) userCacheService.setUser(user);
         }
         return user;
@@ -199,7 +223,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
     @Override
     public int updateUserDetail(UpdateUserDto updateUserDto) {
         LinkhubUserDetails user = SecurityUtils.getLoginObj();
-        Long userId = user.getUser().getId();
+        String userId = user.getUser().getId();
         User updateUser = new User();
         updateUser.setId(userId);
         BeanUtils.copyProperties(updateUserDto, updateUser);

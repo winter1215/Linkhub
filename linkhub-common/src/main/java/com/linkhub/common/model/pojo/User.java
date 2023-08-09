@@ -1,10 +1,12 @@
 package com.linkhub.common.model.pojo;
 
-import com.baomidou.mybatisplus.annotation.*;
-
+import com.baomidou.mybatisplus.annotation.FieldFill;
+import com.baomidou.mybatisplus.annotation.IdType;
 import java.time.LocalDateTime;
-import java.io.Serializable;
 
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
+import java.io.Serializable;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -12,69 +14,52 @@ import lombok.EqualsAndHashCode;
 
 /**
  * <p>
- * 
+ * 用户
  * </p>
  *
- * @author CYY&winter
- * @since 2022-11-20
+ * @author ku&winter
+ * @since 2023-08-08
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
-@ApiModel(value="User对象", description="")
+@ApiModel(value="User对象", description="用户")
 public class User implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @ApiModelProperty(value = "用户id唯一标识")
-    @TableId(value = "id", type = IdType.AUTO)
-    private Long id;
+    @ApiModelProperty(value = "uuid")
+    @TableId(value = "id", type = IdType.ASSIGN_UUID)
+    private String id;
 
-    @ApiModelProperty(value = "用户昵称")
+    private String email;
+
     private String nickname;
 
-    @ApiModelProperty(value = "用户名,用户名不可重复")
-    private String username;
+    @ApiModelProperty(value = "临时帐号")
+    private Boolean temporary;
 
-    @ApiModelProperty(value = "用户密码")
     private String password;
 
-    @ApiModelProperty(value = "用户头像")
+    @ApiModelProperty(value = "头像")
     private String avatar;
 
-    @ApiModelProperty(value = "个性签名")
-    private String introduction;
+    @ApiModelProperty(value = "用户类型")
+    private String type;
 
-    @ApiModelProperty(value = "描述该账号所处状态，0：正常  1：禁言，不能评论与发帖（admin）2: 封禁，不能登录（admin）")
-    private Integer status;
+    @ApiModelProperty(value = "邮箱验证")
+    private Boolean emailVerified;
 
-    @ApiModelProperty(value = "学号")
-    private String studentNo;
+    @ApiModelProperty(value = "封禁")
+    private Boolean banned;
 
-    @ApiModelProperty(value = "姓名")
-    private String realName;
-
-    @ApiModelProperty(value = "性别  0 保密 1 男 2 女")
-    private Integer gender;
-
-    @ApiModelProperty(value = "邮箱")
-    private String mail;
-
-    @ApiModelProperty(value = "被禁言次数")
-    private Integer bannedCount;
-
-    private LocalDateTime bannedBegin;
-
-    private LocalDateTime bannedEnd;
-
-    @TableField(fill = FieldFill.INSERT_UPDATE)
-    private LocalDateTime updateTime;
-
+    @ApiModelProperty(value = "帐号随机标识符")
+    private String discriminator;
 
     @TableField(fill = FieldFill.INSERT)
-    private LocalDateTime createTime;
+    private LocalDateTime createAt;
 
-    @ApiModelProperty(value = "逻辑删除 0：正常   1：删除")
-    @TableLogic
-    private Boolean isDelete;
+    @TableField(fill = FieldFill.INSERT_UPDATE)
+    private LocalDateTime updateAt;
+
 
 }
