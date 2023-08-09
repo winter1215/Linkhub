@@ -13,7 +13,7 @@ spring:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://localhost:3306/linkhub?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai #47.108.28.138
     username: root
-    password: winter
+    password: root
   # redis 的配置
   redis:
     host: 127.0.0.1

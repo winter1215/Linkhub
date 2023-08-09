@@ -66,7 +66,7 @@ public class UserController {
     @ApiOperation("忘记密码")
     @PostMapping("/forget")
     public R forgetPassword(@RequestBody @Validated ForgetPassForm forgetPassForm){
-        return userService.forgetPassword(forgetPassForm.getCode(),forgetPassForm.getEmail(),forgetPassForm.getNewPassword());
+        return userService.forgetPassword(forgetPassForm.getOtp(),forgetPassForm.getEmail(),forgetPassForm.getPassword());
     }
 
     @ApiOperation("更新密码")

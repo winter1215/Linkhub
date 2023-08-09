@@ -6,6 +6,7 @@ import com.linkhub.common.config.redis.RedisCache;
 import com.linkhub.common.enums.CommonConstants;
 import com.linkhub.common.enums.RedisPrefix;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.FileSystemResource;
@@ -51,7 +52,7 @@ public class EmailService {
             // 存 redis
             redisCache.setCacheObject(String.format(RedisPrefix.PREFIX_VERIFY_CODE, mail), code, RedisPrefix.CODE_AVAILABLE_TIME, TimeUnit.MINUTES);
             // 发送邮件
-            sendMail(mail, "Linkhub_验证码", String.format(CommonConstants.REGISTER_CODE_TEMPLATE, code));
+            sendRichMail(mail, "Linkhub_验证码", String.format(CommonConstants.REGISTER_CODE_TEMPLATE, code), "");
 
         } catch (Exception e) {
             log.error("验证码发送异常 => mail: {}, 异常为: ", mail, e);
@@ -114,7 +115,9 @@ public class EmailService {
 
         helper.setText(text,true);
         // 图片占位写法  如果图片链接写入模板 注释下面这一行
-        helper.addInline("qr",new FileSystemResource(filePath));
+        if (StringUtils.isNotBlank(filePath)) {
+            helper.addInline("qr",new FileSystemResource(filePath));
+        }
         javaMailSender.send(mimeMessage);
 
     }
