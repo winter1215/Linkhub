@@ -1,5 +1,8 @@
 package com.linkhub.portal.controller;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.linkhub.common.config.exception.GlobalException;
+import com.linkhub.common.enums.ErrorCode;
 import com.linkhub.common.model.dto.*;
 import com.linkhub.common.model.pojo.User;
 import com.linkhub.common.model.vo.UserVo;
@@ -11,6 +14,7 @@ import com.linkhub.portal.service.impl.EmailService;
 import com.linkhub.security.util.SecurityUtils;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -50,6 +54,12 @@ public class UserController {
     @GetMapping("/code/{mail}")
     @ApiOperation("获取验证码by mail")
     public R getCode(@PathVariable @Email String mail) {
+        LambdaQueryWrapper<User> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(User::getEmail, mail);
+        User user = userService.getOne(wrapper);
+        if (ObjectUtils.isEmpty(user)) {
+            throw new GlobalException(ErrorCode.PARAMS_ERROR, "邮箱未注册，请先注册该邮箱");
+        }
         emailService.sendVerifyCode(mail);
         return R.ok().message("发送验证码成功！");
     }

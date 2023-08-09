@@ -71,4 +71,6 @@ public interface IUserService extends IService<User> {
      * @description:
      */
     int updateUserDetail(UpdateUserDto updateUserDto);
+
+
 }
