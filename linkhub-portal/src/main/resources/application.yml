@@ -65,6 +65,9 @@ secure:
       - /user/forget
       - /user/createTemporaryUser/**
       - /user/claimTemporaryUser
+      - /user/resolveToken/**
+      - /user/searchUserWithUniqueName/**
+      - /user/getUserSettings
       - /im/**
 jwt:
   tokenHeader: Authorization #jwt请求头

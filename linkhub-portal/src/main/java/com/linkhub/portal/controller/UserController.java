@@ -6,6 +6,7 @@ import com.linkhub.common.enums.ErrorCode;
 import com.linkhub.common.model.dto.user.*;
 import com.linkhub.common.model.pojo.User;
 import com.linkhub.common.model.vo.UserVo;
+import com.linkhub.common.utils.MapUtils;
 import com.linkhub.common.utils.R;
 import com.linkhub.portal.security.LinkhubUserDetails;
 import com.linkhub.portal.service.IUserService;
@@ -22,6 +23,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.constraints.Email;
+import java.util.Map;
 
 /**
  * <p>
@@ -120,4 +122,25 @@ public class UserController {
                 .data("tokenHead",tokenHead);
     }
 
+    @ApiOperation("记住登录（使用token登录）")
+    @PostMapping("/resolveToken/{token}")
+    public R resolveToken(@PathVariable String token) {
+        // 通过token解析到id，然后查询用户信息返回
+        UserInfoDto userInfoDto  = userService.resolveToken(token);
+        Map<String, Object> res = MapUtils.convertToMap(userInfoDto);
+        return R.ok()
+                .data(res)
+                .data("token", token)
+                .data("tokenHead",tokenHead); // todo: 这里会出现两个data，转map?
+    }
+
+    @ApiOperation("使用唯一标识名搜索用户名")
+    @PostMapping("/searchUserWithUniqueName/{uniqueName}")
+    public R searchUserWithUniqueName(@PathVariable String uniqueName) {
+        // uniqueName 由 nickname + '-' + discriminator 组成 注意 # 在URL中会被解析为位置标志符，拿不到
+        UserInfoDto userInfoDto  = userService.searchUserWithUniqueName(uniqueName);
+        Map<String, Object> res = MapUtils.convertToMap(userInfoDto);
+        return R.ok()
+                .data(res);
+    }
 }

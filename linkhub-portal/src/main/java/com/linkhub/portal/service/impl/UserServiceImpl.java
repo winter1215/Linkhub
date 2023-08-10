@@ -9,6 +9,7 @@ import com.linkhub.common.enums.RedisPrefix;
 import com.linkhub.common.mapper.UserSettingMapper;
 import com.linkhub.common.model.dto.user.ClaimUserDto;
 import com.linkhub.common.model.dto.user.UpdateUserDto;
+import com.linkhub.common.model.dto.user.UserInfoDto;
 import com.linkhub.common.model.pojo.User;
 import com.linkhub.common.mapper.UserMapper;
 import com.linkhub.common.model.pojo.UserSetting;
@@ -33,6 +34,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 
 /**
  * <p>
@@ -290,5 +292,29 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
         SecurityContextHolder.getContext().setAuthentication(authToken);
         return jwtTokenUtil.generateToken(userDetails);
+    }
+
+    @Override
+    public UserInfoDto resolveToken(String token) {
+        String email = jwtTokenUtil.getUsernameFromToken(token);
+        // 通过email查询user信息
+        LambdaQueryWrapper<User> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(User::getEmail, email);
+        User user = baseMapper.selectOne(wrapper);
+        UserInfoDto userInfoDto = new UserInfoDto();
+        BeanUtils.copyProperties(user, userInfoDto);
+        return userInfoDto;
+    }
+
+    @Override
+    public UserInfoDto searchUserWithUniqueName(String uniqueName) {
+        String[] parts = uniqueName.split("-"); // parts[0] 是nickName parts[1]是discriminator
+        LambdaQueryWrapper<User> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(User::getNickname, parts[0])
+                .eq(User::getDiscriminator, parts[1]);
+        User user = baseMapper.selectOne(wrapper);
+        UserInfoDto userInfoDto = new UserInfoDto();
+        BeanUtils.copyProperties(user, userInfoDto);
+        return userInfoDto;
     }
 }

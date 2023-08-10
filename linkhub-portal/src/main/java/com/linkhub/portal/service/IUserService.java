@@ -2,6 +2,7 @@ package com.linkhub.portal.service;
 
 import com.linkhub.common.model.dto.user.ClaimUserDto;
 import com.linkhub.common.model.dto.user.UpdateUserDto;
+import com.linkhub.common.model.dto.user.UserInfoDto;
 import com.linkhub.common.model.pojo.User;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.linkhub.common.utils.R;
@@ -77,4 +78,8 @@ public interface IUserService extends IService<User> {
     String createTemporaryUser(String nickname);
 
     String claimTemporaryUser(ClaimUserDto claimUserDto);
+
+    UserInfoDto resolveToken(String token);
+
+    UserInfoDto searchUserWithUniqueName(String uniqueName);
 }
