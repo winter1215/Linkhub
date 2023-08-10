@@ -3,7 +3,7 @@ package com.linkhub.portal.controller;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.linkhub.common.config.exception.GlobalException;
 import com.linkhub.common.enums.ErrorCode;
-import com.linkhub.common.model.dto.*;
+import com.linkhub.common.model.dto.user.*;
 import com.linkhub.common.model.pojo.User;
 import com.linkhub.common.model.vo.UserVo;
 import com.linkhub.common.utils.R;
@@ -100,6 +100,24 @@ public class UserController {
     public R editUserDetail(@Validated UpdateUserDto updateUserDto) {
         int flag = userService.updateUserDetail(updateUserDto);
         return flag > 0 ? R.ok() : R.error();
+    }
+
+    @ApiOperation("创建临时用户")
+    @PostMapping("/createTemporaryUser/{nickname}")
+    public R createTemporaryUser(@PathVariable String nickname) {
+        String token = userService.createTemporaryUser(nickname);
+        return R.ok()
+                .data("token",token)
+                .data("tokenHead",tokenHead);
+    }
+
+    @ApiOperation("认领临时用户")
+    @PostMapping("/claimTemporaryUser")
+    public R claimTemporaryUser(@RequestBody @Validated ClaimUserDto claimUserDto) {
+        String token = userService.claimTemporaryUser(claimUserDto);
+        return R.ok()
+                .data("token",token)
+                .data("tokenHead",tokenHead);
     }
 
 }

@@ -2,27 +2,26 @@ package com.linkhub.portal.service.impl;
 
 import cn.hutool.core.util.RandomUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.linkhub.common.config.exception.GlobalException;
 import com.linkhub.common.config.redis.RedisCache;
-import com.linkhub.common.enums.AuthStatus;
 import com.linkhub.common.enums.ErrorCode;
 import com.linkhub.common.enums.RedisPrefix;
 import com.linkhub.common.mapper.UserSettingMapper;
-import com.linkhub.common.model.dto.UpdateUserDto;
+import com.linkhub.common.model.dto.user.ClaimUserDto;
+import com.linkhub.common.model.dto.user.UpdateUserDto;
 import com.linkhub.common.model.pojo.User;
 import com.linkhub.common.mapper.UserMapper;
 import com.linkhub.common.model.pojo.UserSetting;
 import com.linkhub.common.utils.R;
-import com.linkhub.common.model.dto.RegisterUser;
+import com.linkhub.common.model.dto.user.RegisterUser;
 import com.linkhub.portal.security.LinkhubUserDetails;
 import com.linkhub.portal.service.IUserCacheService;
 import com.linkhub.portal.service.IUserService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.linkhub.portal.service.IUserSettingService;
 import com.linkhub.security.util.JwtTokenUtil;
 import com.linkhub.security.util.SecurityUtils;
 import org.apache.commons.lang3.ObjectUtils;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -34,8 +33,6 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.time.LocalDateTime;
 
 /**
  * <p>
@@ -63,6 +60,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
     @Autowired
     private JwtTokenUtil jwtTokenUtil;
 
+    private String emailSuffix = ".temporary@linkhub.com";
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -228,5 +226,69 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         updateUser.setId(userId);
         BeanUtils.copyProperties(updateUserDto, updateUser);
         return updateUser(updateUser);
+    }
+
+    /**
+     * 创建一个临时账号
+     * @param nickname
+     * @return
+     */
+    @Override
+    public String createTemporaryUser(String nickname) {
+        // 设置为临时账户和设置用户名
+        User temporaryUser = new User();
+        temporaryUser.setNickname(nickname);
+        temporaryUser.setTemporary(true);
+        // 1.创建唯一标识符
+        String discriminator = generateDiscriminator(nickname, 10);
+        temporaryUser.setDiscriminator(discriminator);
+        // 2.创建随机密码和随机邮箱
+        String email = RandomStringUtils.randomAlphanumeric(10) + emailSuffix;
+        temporaryUser.setEmail(email);
+        String password = passwordEncoder.encode(RandomStringUtils.randomAlphanumeric(10));
+        temporaryUser.setPassword(password);
+        // 3.User写入数据库
+        baseMapper.insert(temporaryUser);
+        // 4.UserSetting写入数据库
+        UserSetting userSetting = new UserSetting();
+        userSetting.setUserId(temporaryUser.getId());
+        userSettingMapper.insert(userSetting);
+        // 5.创建token并返回
+        UserDetails userDetails = loadUserByUsername(email);
+        UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+        SecurityContextHolder.getContext().setAuthentication(authToken);
+        return jwtTokenUtil.generateToken(userDetails);
+    }
+
+    /**
+     * 认领临时用户
+     * @param claimUserDto 认领用户的dto
+     * @return
+     */
+    @Override
+    public String claimTemporaryUser(ClaimUserDto claimUserDto) {
+        LambdaQueryWrapper<User> wrapper = new LambdaQueryWrapper();
+        wrapper.eq(User::getId, claimUserDto.getUserId());
+        User user = baseMapper.selectOne(wrapper);
+
+
+        if (ObjectUtils.isEmpty(user)) {
+            throw new GlobalException("要认领的用户不存在", ErrorCode.NOT_FOUND_ERROR.getCode());
+        }
+
+        if (!user.getTemporary()) {
+            throw new GlobalException("该用户不是临时用户", ErrorCode.PARAMS_ERROR.getCode());
+        }
+
+        // 更新数据
+        user.setEmail(claimUserDto.getEmail());
+        user.setPassword(passwordEncoder.encode(claimUserDto.getPassword()));
+        user.setTemporary(false);
+        // 更新到数据库
+        baseMapper.updateById(user);
+        UserDetails userDetails = loadUserByUsername(user.getEmail());
+        UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+        SecurityContextHolder.getContext().setAuthentication(authToken);
+        return jwtTokenUtil.generateToken(userDetails);
     }
 }

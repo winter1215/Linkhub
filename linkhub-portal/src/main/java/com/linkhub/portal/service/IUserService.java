@@ -1,10 +1,11 @@
 package com.linkhub.portal.service;
 
-import com.linkhub.common.model.dto.UpdateUserDto;
+import com.linkhub.common.model.dto.user.ClaimUserDto;
+import com.linkhub.common.model.dto.user.UpdateUserDto;
 import com.linkhub.common.model.pojo.User;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.linkhub.common.utils.R;
-import com.linkhub.common.model.dto.RegisterUser;
+import com.linkhub.common.model.dto.user.RegisterUser;
 import org.springframework.security.core.userdetails.UserDetails;
 
 /**
@@ -73,4 +74,7 @@ public interface IUserService extends IService<User> {
     int updateUserDetail(UpdateUserDto updateUserDto);
 
 
+    String createTemporaryUser(String nickname);
+
+    String claimTemporaryUser(ClaimUserDto claimUserDto);
 }
