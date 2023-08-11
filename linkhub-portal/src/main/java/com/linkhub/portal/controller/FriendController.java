@@ -1,4 +1,4 @@
-package com.linkhub.tmp.controller;
+package com.linkhub.portal.controller;
 
 
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -7,14 +7,14 @@ import org.springframework.web.bind.annotation.RestController;
 
 /**
  * <p>
- * 用户 前端控制器
+ * 好友表 前端控制器
  * </p>
  *
  * @author ku&winter
- * @since 2023-08-08
+ * @since 2023-08-11
  */
 @RestController
-@RequestMapping("/user")
-public class UserController {
+@RequestMapping("/friend")
+public class FriendController {
 
 }
