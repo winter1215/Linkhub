@@ -63,10 +63,10 @@ secure:
       - /user/code/**
       - /user/login
       - /user/forget
-      - /user/createTemporaryUser/**
+      - /user/createTemporaryUser
       - /user/claimTemporaryUser
-      - /user/resolveToken/**
-      - /user/searchUserWithUniqueName/**
+      - /user/resolveToken
+      - /user/searchUserWithUniqueName
       - /user/getUserSettings
       - /im/**
 jwt:

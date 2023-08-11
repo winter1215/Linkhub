@@ -7,6 +7,9 @@ import com.linkhub.common.config.redis.RedisCache;
 import com.linkhub.common.enums.ErrorCode;
 import com.linkhub.common.enums.RedisPrefix;
 import com.linkhub.common.mapper.UserSettingMapper;
+import com.linkhub.common.model.common.TokenRequest;
+import com.linkhub.common.model.common.UniqueNameRequest;
+import com.linkhub.common.model.common.UserNameRequest;
 import com.linkhub.common.model.dto.user.ClaimUserDto;
 import com.linkhub.common.model.dto.user.UpdateUserDto;
 import com.linkhub.common.model.dto.user.UserInfoDto;
@@ -23,8 +26,10 @@ import com.linkhub.security.util.JwtTokenUtil;
 import com.linkhub.security.util.SecurityUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.AuthenticationException;
@@ -62,6 +67,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
     @Autowired
     private JwtTokenUtil jwtTokenUtil;
 
+    @Value("${jwt.tokenHead}")
+    private String tokenHead;
     private String emailSuffix = ".temporary@linkhub.com";
 
     @Override
@@ -232,12 +239,17 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
 
     /**
      * 创建一个临时账号
-     * @param nickname
+     * @param userNameRequest
      * @return
      */
     @Override
-    public String createTemporaryUser(String nickname) {
+    public String createTemporaryUser(UserNameRequest userNameRequest) {
+        // 判断nickname是否为空
+        if (ObjectUtils.isEmpty(userNameRequest) || StringUtils.isBlank(userNameRequest.getNickname()) || StringUtils.isEmpty(userNameRequest.getNickname())) {
+            throw new GlobalException(ErrorCode.PARAMS_ERROR.getMessage(),ErrorCode.PARAMS_ERROR.getCode());
+        }
         // 设置为临时账户和设置用户名
+        String nickname = userNameRequest.getNickname();
         User temporaryUser = new User();
         temporaryUser.setNickname(nickname);
         temporaryUser.setTemporary(true);
@@ -295,7 +307,15 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
     }
 
     @Override
-    public UserInfoDto resolveToken(String token) {
+    public UserInfoDto resolveToken(TokenRequest tokenRequest) {
+        if (ObjectUtils.isEmpty(tokenRequest) ||StringUtils.isBlank(tokenRequest.getToken()) || StringUtils.isEmpty(tokenRequest.getToken())) {
+            throw new GlobalException(ErrorCode.PARAMS_ERROR.getMessage(),ErrorCode.PARAMS_ERROR.getCode());
+        }
+        String token = tokenRequest.getToken();
+        if (!token.startsWith(tokenHead)) {
+            throw new GlobalException(ErrorCode.PARAMS_ERROR.getMessage(), ErrorCode.PARAMS_ERROR.getCode());
+        }
+        token = token.substring(tokenHead.length());
         String email = jwtTokenUtil.getUsernameFromToken(token);
         // 通过email查询user信息
         LambdaQueryWrapper<User> wrapper = new LambdaQueryWrapper<>();
@@ -307,8 +327,15 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
     }
 
     @Override
-    public UserInfoDto searchUserWithUniqueName(String uniqueName) {
-        String[] parts = uniqueName.split("-"); // parts[0] 是nickName parts[1]是discriminator
+    public UserInfoDto searchUserWithUniqueName(UniqueNameRequest uniqueNameRequest) {
+        if (ObjectUtils.isEmpty(uniqueNameRequest) || StringUtils.isBlank(uniqueNameRequest.getUniqueName()) || StringUtils.isEmpty(uniqueNameRequest.getUniqueName())) {
+            throw new GlobalException(ErrorCode.PARAMS_ERROR.getMessage(),ErrorCode.PARAMS_ERROR.getCode());
+        }
+        String uniqueName = uniqueNameRequest.getUniqueName();
+        String[] parts = uniqueName.split("#"); // parts[0] 是nickName parts[1]是discriminator
+        if (parts.length != 2) {
+            throw new GlobalException(ErrorCode.PARAMS_ERROR.getMessage(),ErrorCode.PARAMS_ERROR.getCode());
+        }
         LambdaQueryWrapper<User> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(User::getNickname, parts[0])
                 .eq(User::getDiscriminator, parts[1]);
@@ -316,5 +343,16 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         UserInfoDto userInfoDto = new UserInfoDto();
         BeanUtils.copyProperties(user, userInfoDto);
         return userInfoDto;
+    }
+
+    @Override
+    public UserSetting getUserSettings(User user) {
+        if (ObjectUtils.isEmpty(user) || StringUtils.isEmpty(user.getId())) {
+            throw new GlobalException(ErrorCode.PARAMS_ERROR.getMessage(),ErrorCode.PARAMS_ERROR.getCode());
+        }
+        LambdaQueryWrapper<UserSetting> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(UserSetting::getUserId, user.getId());
+        UserSetting userSetting = userSettingMapper.selectOne(wrapper);
+        return userSetting;
     }
 }

@@ -3,8 +3,12 @@ package com.linkhub.portal.controller;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.linkhub.common.config.exception.GlobalException;
 import com.linkhub.common.enums.ErrorCode;
+import com.linkhub.common.model.common.TokenRequest;
+import com.linkhub.common.model.common.UniqueNameRequest;
+import com.linkhub.common.model.common.UserNameRequest;
 import com.linkhub.common.model.dto.user.*;
 import com.linkhub.common.model.pojo.User;
+import com.linkhub.common.model.pojo.UserSetting;
 import com.linkhub.common.model.vo.UserVo;
 import com.linkhub.common.utils.MapUtils;
 import com.linkhub.common.utils.R;
@@ -105,12 +109,11 @@ public class UserController {
     }
 
     @ApiOperation("创建临时用户")
-    @PostMapping("/createTemporaryUser/{nickname}")
-    public R createTemporaryUser(@PathVariable String nickname) {
-        String token = userService.createTemporaryUser(nickname);
+    @PostMapping("/createTemporaryUser")
+    public R createTemporaryUser(@RequestBody UserNameRequest userNameRequest) {
+        String token = userService.createTemporaryUser(userNameRequest);
         return R.ok()
-                .data("token",token)
-                .data("tokenHead",tokenHead);
+                .data("token",tokenHead + token);
     }
 
     @ApiOperation("认领临时用户")
@@ -118,28 +121,37 @@ public class UserController {
     public R claimTemporaryUser(@RequestBody @Validated ClaimUserDto claimUserDto) {
         String token = userService.claimTemporaryUser(claimUserDto);
         return R.ok()
-                .data("token",token)
-                .data("tokenHead",tokenHead);
+                .data("token",tokenHead + token);
     }
 
     @ApiOperation("记住登录（使用token登录）")
-    @PostMapping("/resolveToken/{token}")
-    public R resolveToken(@PathVariable String token) {
+    @PostMapping("/resolveToken")
+    public R resolveToken(@RequestBody TokenRequest tokenRequest) {
         // 通过token解析到id，然后查询用户信息返回
-        UserInfoDto userInfoDto  = userService.resolveToken(token);
+        UserInfoDto userInfoDto  = userService.resolveToken(tokenRequest);
         Map<String, Object> res = MapUtils.convertToMap(userInfoDto);
         return R.ok()
                 .data(res)
-                .data("token", token)
-                .data("tokenHead",tokenHead); // todo: 这里会出现两个data，转map?
+                .data("token", tokenRequest.getToken()); // todo: 这里会出现两个data，转map?
     }
 
     @ApiOperation("使用唯一标识名搜索用户名")
-    @PostMapping("/searchUserWithUniqueName/{uniqueName}")
-    public R searchUserWithUniqueName(@PathVariable String uniqueName) {
+    @PostMapping("/searchUserWithUniqueName")
+    public R searchUserWithUniqueName(@RequestBody UniqueNameRequest uniqueNameRequest) {
         // uniqueName 由 nickname + '-' + discriminator 组成 注意 # 在URL中会被解析为位置标志符，拿不到
-        UserInfoDto userInfoDto  = userService.searchUserWithUniqueName(uniqueName);
+        UserInfoDto userInfoDto  = userService.searchUserWithUniqueName(uniqueNameRequest);
         Map<String, Object> res = MapUtils.convertToMap(userInfoDto);
+        return R.ok()
+                .data(res);
+    }
+
+    @ApiOperation("获取用户设置")
+    @GetMapping("/getUserSettings")
+    public R getUserSettings() {
+        LinkhubUserDetails userDetails = SecurityUtils.getLoginObj();
+        User user = userDetails.getUser();
+        UserSetting userSetting  = userService.getUserSettings(user);
+        Map<String, Object> res = MapUtils.convertToMap(userSetting);
         return R.ok()
                 .data(res);
     }
