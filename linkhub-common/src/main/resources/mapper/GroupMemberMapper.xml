@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.linkhub.common.mapper.GroupMemberMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.linkhub.common.model.pojo.GroupMember">
+        <id column="id" property="id" />
+        <result column="group_id" property="groupId" />
+        <result column="user_id" property="userId" />
+        <result column="roles" property="roles" />
+        <result column="mute_util" property="muteUtil" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, group_id, user_id, roles, mute_util
+    </sql>
+
+</mapper>
