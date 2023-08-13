@@ -55,12 +55,12 @@ public class Generator {
 
         // 数据源配置
         DataSourceConfig dsc = new DataSourceConfig();
-        dsc.setUrl("jdbc:mysql://localhost:3306/linkhub?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai");
+        dsc.setUrl("jdbc:mysql://47.108.28.138:3306/linkhub?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai");
         // dsc.setSchemaName("public");
         dsc.setDriverName("com.mysql.cj.jdbc.Driver");
-        dsc.setUsername("root");
+        dsc.setUsername("linkhub");
 //        dsc.setPassword("winter");
-        dsc.setPassword("winter");
+        dsc.setPassword("fhNnnNYHBWhZbxHt");
         mpg.setDataSource(dsc);
 
         // 包配置

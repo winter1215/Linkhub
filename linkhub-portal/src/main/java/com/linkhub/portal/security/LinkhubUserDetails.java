@@ -1,6 +1,5 @@
 package com.linkhub.portal.security;
 
-import com.linkhub.common.enums.AuthStatus;
 import com.linkhub.common.model.pojo.User;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

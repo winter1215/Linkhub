@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.annotation.FieldFill;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
+import com.linkhub.common.model.dto.message.SendMsgDto;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -58,5 +59,15 @@ public class Message implements Serializable {
     @TableField(fill = FieldFill.INSERT_UPDATE)
     private LocalDateTime updateAt;
 
-
+    public static Message coverToDomain(SendMsgDto sendMsgDto) {
+        Message message = new Message();
+        message.setContent(message.getContent());
+        message.setAuthor(message.getAuthor());
+        message.setConverseId(message.converseId);
+        message.setReplyId(message.getReplyId());
+        message.setReplyContent(message.replyContent);
+        message.setReplyAuthor(message.getReplyAuthor());
+        message.setGroupId(message.getGroupId());
+        return message;
+    }
 }

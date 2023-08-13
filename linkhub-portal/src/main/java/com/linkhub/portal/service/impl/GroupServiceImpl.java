@@ -1,10 +1,18 @@
 package com.linkhub.portal.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.linkhub.common.mapper.GroupMemberMapper;
 import com.linkhub.common.model.pojo.Group;
 import com.linkhub.common.mapper.GroupMapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.linkhub.common.model.pojo.GroupMember;
+import com.linkhub.portal.security.LinkhubUserDetails;
 import com.linkhub.portal.service.IGroupService;
+import com.linkhub.security.util.SecurityUtils;
 import org.springframework.stereotype.Service;
+
+import javax.annotation.Resource;
+import java.util.List;
 
 /**
  * <p>
@@ -16,5 +24,28 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class GroupServiceImpl extends ServiceImpl<GroupMapper, Group> implements IGroupService {
+    @Resource
+    private GroupMemberMapper groupMemberMapper;
 
+    @Override
+    public List<GroupMember> selectMemberList(String groupId) {
+        LambdaQueryWrapper<GroupMember> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(GroupMember::getGroupId, groupId);
+        return groupMemberMapper.selectList(wrapper);
+    }
+
+    @Override
+    public GroupMember checkUserInGroup(String groupId, String userId) {
+        LambdaQueryWrapper<GroupMember> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(GroupMember::getGroupId, groupId);
+        wrapper.eq(GroupMember::getUserId, userId);
+        return groupMemberMapper.selectOne(wrapper);
+    }
+
+    @Override
+    public GroupMember checkMeInGroup(String groupId) {
+        LinkhubUserDetails user = SecurityUtils.getLoginObj();
+        String userId = user.getUser().getId();
+        return checkUserInGroup(groupId, userId);
+    }
 }

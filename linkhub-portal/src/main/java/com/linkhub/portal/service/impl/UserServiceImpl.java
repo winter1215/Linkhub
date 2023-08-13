@@ -2,10 +2,8 @@ package com.linkhub.portal.service.impl;
 
 import cn.hutool.core.util.RandomUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.linkhub.common.config.exception.GlobalException;
 import com.linkhub.common.config.redis.RedisCache;
-import com.linkhub.common.enums.AuthStatus;
 import com.linkhub.common.enums.ErrorCode;
 import com.linkhub.common.enums.RedisPrefix;
 import com.linkhub.common.mapper.UserSettingMapper;
@@ -19,7 +17,6 @@ import com.linkhub.portal.security.LinkhubUserDetails;
 import com.linkhub.portal.service.IUserCacheService;
 import com.linkhub.portal.service.IUserService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.linkhub.portal.service.IUserSettingService;
 import com.linkhub.security.util.JwtTokenUtil;
 import com.linkhub.security.util.SecurityUtils;
 import org.apache.commons.lang3.ObjectUtils;

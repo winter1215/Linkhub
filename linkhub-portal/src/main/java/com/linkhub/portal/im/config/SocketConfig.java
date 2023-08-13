@@ -2,7 +2,7 @@ package com.linkhub.portal.im.config;
 
 import com.corundumstudio.socketio.SocketIOServer;
 import com.corundumstudio.socketio.annotation.SpringAnnotationScanner;
-import com.linkhub.portal.im.handler.LinkhubAuthListener;
+import com.linkhub.portal.im.handler.DefaultAuthListener;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -42,7 +42,7 @@ public class SocketConfig {
     private int maxHttpContentLength;
 
     @Autowired
-    LinkhubAuthListener linkhubAuthListener;
+    DefaultAuthListener defaultAuthListener;
 
     /**
      * SocketIOServer配置
@@ -69,7 +69,7 @@ public class SocketConfig {
         config.setPingTimeout(pingTimeout);
         // Ping消息间隔(毫秒)，默认25秒。客户端向服务器发送一条心跳消息间隔
         config.setPingInterval(pingInterval);
-        config.setAuthorizationListener(linkhubAuthListener);
+        config.setAuthorizationListener(defaultAuthListener);
         // 设置HTTP交互最大内容长度
         config.setMaxHttpContentLength(maxHttpContentLength);
         // 设置最大每帧处理数据的长度，防止他人利用大数据来攻击服务器

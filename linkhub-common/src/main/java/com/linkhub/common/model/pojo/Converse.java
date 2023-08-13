@@ -13,41 +13,27 @@ import lombok.EqualsAndHashCode;
 
 /**
  * <p>
- * 群组 info
+ * 会话表
  * </p>
  *
  * @author ku&winter
- * @since 2023-08-12
+ * @since 2023-08-13
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
-@ApiModel(value="Group对象", description="群组 info")
-public class Group implements Serializable {
+@ApiModel(value="Converse对象", description="会话表")
+public class Converse implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
     @TableId(value = "id", type = IdType.ASSIGN_UUID)
     private String id;
 
-    private String name;
+    private String converseId;
 
-    @ApiModelProperty(value = "创建者")
-    private String owner;
+    private String type;
 
-    @ApiModelProperty(value = "群组描述")
-    private String description;
-
-    @ApiModelProperty(value = "群组头像")
-    private String avatar;
-
-    @ApiModelProperty(value = "是否隐藏用户的随机码")
-    private Boolean hideMemberInfo;
-
-    @ApiModelProperty(value = "群组背景图片")
-    private String groupBackgroundImage;
-
-    @ApiModelProperty(value = "权限列表: Enum, Json")
-    private String fallbackPermission;
+    private String member;
 
     @TableField(fill = FieldFill.INSERT)
     private LocalDateTime createAt;

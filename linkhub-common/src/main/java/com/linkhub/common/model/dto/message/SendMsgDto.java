@@ -11,11 +11,11 @@ import java.util.List;
  */
 @Data
 public class SendMsgDto {
-    public String content;
-    public String converseId;
-    public Meta meta;
-    public String groupId;
-    public String plain;
+    private String content;
+    private String converseId;
+    private Meta meta;
+    private String groupId;
+    private String plain;
 
 
     /**
@@ -26,8 +26,8 @@ public class SendMsgDto {
         /**
          * @ 的好友数组
          */
-        public List<String> mentions;
-        public Reply reply;
+        private List<String> mentions;
+        private Reply reply;
     }
 
     @Data
@@ -35,10 +35,10 @@ public class SendMsgDto {
         /**
          * 回复的消息id
          */
-        public String _id;
+        private String _id;
 
-        public String author;
-        public String content;
+        private String author;
+        private String content;
 
     }
 }

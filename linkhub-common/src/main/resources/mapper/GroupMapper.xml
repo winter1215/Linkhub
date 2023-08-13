@@ -7,7 +7,7 @@
         <id column="id" property="id" />
         <result column="name" property="name" />
         <result column="owner" property="owner" />
-        <result column="discription" property="discription" />
+        <result column="description" property="description" />
         <result column="avatar" property="avatar" />
         <result column="hide_member_info" property="hideMemberInfo" />
         <result column="group_background_image" property="groupBackgroundImage" />
@@ -18,7 +18,7 @@
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        id, name, owner, discription, avatar, hide_member_info, group_background_image, fallback_permission, create_at, update_at
+        id, name, owner, description, avatar, hide_member_info, group_background_image, fallback_permission, create_at, update_at
     </sql>
 
 </mapper>

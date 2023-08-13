@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Resource;
 import java.io.IOException;
 
 /**
@@ -16,16 +17,17 @@ import java.io.IOException;
  * @create 2023-08-11 下午4:24
  */
 @Component
-public class LinkhubAuthListener implements AuthorizationListener {
+public class DefaultAuthListener implements AuthorizationListener {
     @Value("${jwt.tokenHead}")
     private String tokenHead;
 
-    @Autowired
+    @Resource
     private JwtTokenUtil tokenUtil;
 
+    private String TOKEN_PARAM = "token";
     @Override
     public boolean isAuthorized(HandshakeData data) {
-        String token = data.getSingleUrlParam("token");
+        String token = data.getSingleUrlParam(TOKEN_PARAM);
         // 如果未传递 accessToken 或者没有带头
         if (StringUtils.isEmpty(token) || !token.startsWith(tokenHead)) {
             return false;
@@ -35,9 +37,6 @@ public class LinkhubAuthListener implements AuthorizationListener {
         // token 鉴权
         String username = tokenUtil.getUsernameFromToken(token);
 
-        if (username == null) {
-            return false;
-        }
-        return true;
+        return username != null;
     }
 }
