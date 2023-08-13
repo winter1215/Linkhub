@@ -11,9 +11,9 @@ spring:
   #数据库配置
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/linkhub?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai #47.108.28.138
-    username: root
-    password: root
+    url: jdbc:mysql://47.108.28.138:3306/linkhub?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai #47.108.28.138
+    username: linkhub
+    password: fhNnnNYHBWhZbxHt
   # redis 的配置
   redis:
     host: 127.0.0.1
@@ -68,6 +68,8 @@ secure:
       - /user/resolveToken
       - /user/searchUserWithUniqueName
       - /user/getUserSettings
+      - /user/getUserInfoList
+      - /userdmlist/addConverse
       - /im/**
 jwt:
   tokenHeader: Authorization #jwt请求头

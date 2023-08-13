@@ -70,5 +70,4 @@ public class R {
         this.setData(map);
         return this;
     }
-
 }

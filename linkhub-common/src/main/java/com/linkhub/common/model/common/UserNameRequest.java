@@ -3,6 +3,7 @@ package com.linkhub.common.model.common;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
+import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 
 /**
@@ -11,5 +12,6 @@ import java.io.Serializable;
  */
 @Data
 public class UserNameRequest implements Serializable {
+    @NotNull(message = "昵称不能为空")
     private String nickname;
 }

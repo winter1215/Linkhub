@@ -7,17 +7,12 @@ import com.linkhub.common.config.redis.RedisCache;
 import com.linkhub.common.enums.ErrorCode;
 import com.linkhub.common.enums.RedisPrefix;
 import com.linkhub.common.mapper.UserSettingMapper;
-import com.linkhub.common.model.common.TokenRequest;
-import com.linkhub.common.model.common.UniqueNameRequest;
-import com.linkhub.common.model.common.UserNameRequest;
-import com.linkhub.common.model.dto.user.ClaimUserDto;
-import com.linkhub.common.model.dto.user.UpdateUserDto;
-import com.linkhub.common.model.dto.user.UserInfoDto;
+import com.linkhub.common.model.common.*;
+import com.linkhub.common.model.dto.user.*;
 import com.linkhub.common.model.pojo.User;
 import com.linkhub.common.mapper.UserMapper;
 import com.linkhub.common.model.pojo.UserSetting;
 import com.linkhub.common.utils.R;
-import com.linkhub.common.model.dto.user.RegisterUser;
 import com.linkhub.portal.security.LinkhubUserDetails;
 import com.linkhub.portal.service.IUserCacheService;
 import com.linkhub.portal.service.IUserService;
@@ -39,6 +34,9 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 
 /**
@@ -354,5 +352,23 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         wrapper.eq(UserSetting::getUserId, user.getId());
         UserSetting userSetting = userSettingMapper.selectOne(wrapper);
         return userSetting;
+    }
+
+    @Override
+    public List<UserInfoDto> getUserInfoList(UserIdsRequest userIdsRequest) {
+        if (ObjectUtils.isEmpty(userIdsRequest) || ObjectUtils.isEmpty(userIdsRequest.getUserIds())) {
+            throw new GlobalException(ErrorCode.PARAMS_ERROR.getMessage(),ErrorCode.PARAMS_ERROR.getCode());
+        }
+        LambdaQueryWrapper<User> wrapper = new LambdaQueryWrapper<>();
+        wrapper.in(User::getId, userIdsRequest.getUserIds());
+        List<User> users = baseMapper.selectList(wrapper);
+        List<UserInfoDto> userInfoDtoList = users.stream()
+                .map(user -> {
+                    UserInfoDto userInfoDto = new UserInfoDto();
+                    BeanUtils.copyProperties(user, userInfoDto);
+                    return userInfoDto;
+                })
+                .collect(Collectors.toList());
+        return userInfoDtoList;
     }
 }
