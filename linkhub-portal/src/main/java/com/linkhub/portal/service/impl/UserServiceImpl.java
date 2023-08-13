@@ -7,12 +7,17 @@ import com.linkhub.common.config.redis.RedisCache;
 import com.linkhub.common.enums.ErrorCode;
 import com.linkhub.common.enums.RedisPrefix;
 import com.linkhub.common.mapper.UserSettingMapper;
-import com.linkhub.common.model.dto.UpdateUserDto;
+import com.linkhub.common.model.common.TokenRequest;
+import com.linkhub.common.model.common.UniqueNameRequest;
+import com.linkhub.common.model.common.UserNameRequest;
+import com.linkhub.common.model.dto.user.ClaimUserDto;
+import com.linkhub.common.model.dto.user.UpdateUserDto;
+import com.linkhub.common.model.dto.user.UserInfoDto;
 import com.linkhub.common.model.pojo.User;
 import com.linkhub.common.mapper.UserMapper;
 import com.linkhub.common.model.pojo.UserSetting;
 import com.linkhub.common.utils.R;
-import com.linkhub.common.model.dto.RegisterUser;
+import com.linkhub.common.model.dto.user.RegisterUser;
 import com.linkhub.portal.security.LinkhubUserDetails;
 import com.linkhub.portal.service.IUserCacheService;
 import com.linkhub.portal.service.IUserService;
@@ -20,8 +25,11 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.linkhub.security.util.JwtTokenUtil;
 import com.linkhub.security.util.SecurityUtils;
 import org.apache.commons.lang3.ObjectUtils;
+import org.apache.commons.lang3.RandomStringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.AuthenticationException;
@@ -32,7 +40,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 
 /**
  * <p>
@@ -60,6 +67,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
     @Autowired
     private JwtTokenUtil jwtTokenUtil;
 
+    @Value("${jwt.tokenHead}")
+    private String tokenHead;
+    private String emailSuffix = ".temporary@linkhub.com";
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -225,5 +235,124 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         updateUser.setId(userId);
         BeanUtils.copyProperties(updateUserDto, updateUser);
         return updateUser(updateUser);
+    }
+
+    /**
+     * 创建一个临时账号
+     * @param userNameRequest
+     * @return
+     */
+    @Override
+    public String createTemporaryUser(UserNameRequest userNameRequest) {
+        // 判断nickname是否为空
+        if (ObjectUtils.isEmpty(userNameRequest) || StringUtils.isBlank(userNameRequest.getNickname()) || StringUtils.isEmpty(userNameRequest.getNickname())) {
+            throw new GlobalException(ErrorCode.PARAMS_ERROR.getMessage(),ErrorCode.PARAMS_ERROR.getCode());
+        }
+        // 设置为临时账户和设置用户名
+        String nickname = userNameRequest.getNickname();
+        User temporaryUser = new User();
+        temporaryUser.setNickname(nickname);
+        temporaryUser.setTemporary(true);
+        // 1.创建唯一标识符
+        String discriminator = generateDiscriminator(nickname, 10);
+        temporaryUser.setDiscriminator(discriminator);
+        // 2.创建随机密码和随机邮箱
+        String email = RandomStringUtils.randomAlphanumeric(10) + emailSuffix;
+        temporaryUser.setEmail(email);
+        String password = passwordEncoder.encode(RandomStringUtils.randomAlphanumeric(10));
+        temporaryUser.setPassword(password);
+        // 3.User写入数据库
+        baseMapper.insert(temporaryUser);
+        // 4.UserSetting写入数据库
+        UserSetting userSetting = new UserSetting();
+        userSetting.setUserId(temporaryUser.getId());
+        userSettingMapper.insert(userSetting);
+        // 5.创建token并返回
+        UserDetails userDetails = loadUserByUsername(email);
+        UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+        SecurityContextHolder.getContext().setAuthentication(authToken);
+        return jwtTokenUtil.generateToken(userDetails);
+    }
+
+    /**
+     * 认领临时用户
+     * @param claimUserDto 认领用户的dto
+     * @return
+     */
+    @Override
+    public String claimTemporaryUser(ClaimUserDto claimUserDto) {
+        LambdaQueryWrapper<User> wrapper = new LambdaQueryWrapper();
+        wrapper.eq(User::getId, claimUserDto.getUserId());
+        User user = baseMapper.selectOne(wrapper);
+
+
+        if (ObjectUtils.isEmpty(user)) {
+            throw new GlobalException("要认领的用户不存在", ErrorCode.NOT_FOUND_ERROR.getCode());
+        }
+
+        if (!user.getTemporary()) {
+            throw new GlobalException("该用户不是临时用户", ErrorCode.PARAMS_ERROR.getCode());
+        }
+
+        // 更新数据
+        user.setEmail(claimUserDto.getEmail());
+        user.setPassword(passwordEncoder.encode(claimUserDto.getPassword()));
+        user.setTemporary(false);
+        // 更新到数据库
+        baseMapper.updateById(user);
+        UserDetails userDetails = loadUserByUsername(user.getEmail());
+        UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+        SecurityContextHolder.getContext().setAuthentication(authToken);
+        return jwtTokenUtil.generateToken(userDetails);
+    }
+
+    @Override
+    public UserInfoDto resolveToken(TokenRequest tokenRequest) {
+        if (ObjectUtils.isEmpty(tokenRequest) ||StringUtils.isBlank(tokenRequest.getToken()) || StringUtils.isEmpty(tokenRequest.getToken())) {
+            throw new GlobalException(ErrorCode.PARAMS_ERROR.getMessage(),ErrorCode.PARAMS_ERROR.getCode());
+        }
+        String token = tokenRequest.getToken();
+        if (!token.startsWith(tokenHead)) {
+            throw new GlobalException(ErrorCode.PARAMS_ERROR.getMessage(), ErrorCode.PARAMS_ERROR.getCode());
+        }
+        token = token.substring(tokenHead.length());
+        String email = jwtTokenUtil.getUsernameFromToken(token);
+        // 通过email查询user信息
+        LambdaQueryWrapper<User> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(User::getEmail, email);
+        User user = baseMapper.selectOne(wrapper);
+        UserInfoDto userInfoDto = new UserInfoDto();
+        BeanUtils.copyProperties(user, userInfoDto);
+        return userInfoDto;
+    }
+
+    @Override
+    public UserInfoDto searchUserWithUniqueName(UniqueNameRequest uniqueNameRequest) {
+        if (ObjectUtils.isEmpty(uniqueNameRequest) || StringUtils.isBlank(uniqueNameRequest.getUniqueName()) || StringUtils.isEmpty(uniqueNameRequest.getUniqueName())) {
+            throw new GlobalException(ErrorCode.PARAMS_ERROR.getMessage(),ErrorCode.PARAMS_ERROR.getCode());
+        }
+        String uniqueName = uniqueNameRequest.getUniqueName();
+        String[] parts = uniqueName.split("#"); // parts[0] 是nickName parts[1]是discriminator
+        if (parts.length != 2) {
+            throw new GlobalException(ErrorCode.PARAMS_ERROR.getMessage(),ErrorCode.PARAMS_ERROR.getCode());
+        }
+        LambdaQueryWrapper<User> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(User::getNickname, parts[0])
+                .eq(User::getDiscriminator, parts[1]);
+        User user = baseMapper.selectOne(wrapper);
+        UserInfoDto userInfoDto = new UserInfoDto();
+        BeanUtils.copyProperties(user, userInfoDto);
+        return userInfoDto;
+    }
+
+    @Override
+    public UserSetting getUserSettings(User user) {
+        if (ObjectUtils.isEmpty(user) || StringUtils.isEmpty(user.getId())) {
+            throw new GlobalException(ErrorCode.PARAMS_ERROR.getMessage(),ErrorCode.PARAMS_ERROR.getCode());
+        }
+        LambdaQueryWrapper<UserSetting> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(UserSetting::getUserId, user.getId());
+        UserSetting userSetting = userSettingMapper.selectOne(wrapper);
+        return userSetting;
     }
 }

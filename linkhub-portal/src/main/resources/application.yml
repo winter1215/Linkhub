@@ -63,6 +63,7 @@ secure:
       - /user/code/**
       - /user/login
       - /user/forget
+      - /user/createTemporaryUser
       - /im/**
 jwt:
   tokenHeader: Authorization #jwt请求头

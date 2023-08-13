@@ -1,10 +1,16 @@
 package com.linkhub.portal.service;
 
-import com.linkhub.common.model.dto.UpdateUserDto;
+import com.linkhub.common.model.common.TokenRequest;
+import com.linkhub.common.model.common.UniqueNameRequest;
+import com.linkhub.common.model.common.UserNameRequest;
+import com.linkhub.common.model.dto.user.ClaimUserDto;
+import com.linkhub.common.model.dto.user.UpdateUserDto;
+import com.linkhub.common.model.dto.user.UserInfoDto;
 import com.linkhub.common.model.pojo.User;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.linkhub.common.model.pojo.UserSetting;
 import com.linkhub.common.utils.R;
-import com.linkhub.common.model.dto.RegisterUser;
+import com.linkhub.common.model.dto.user.RegisterUser;
 import org.springframework.security.core.userdetails.UserDetails;
 
 /**
@@ -47,12 +53,12 @@ public interface IUserService extends IService<User> {
     /**
      * 忘记密码，验证验证码是否正确，再通过邮箱获取对应用户更改其密码
      *
-     * @param code 验证码
+     * @param otp 验证码
      * @param email 邮箱
      * @param password 新密码
      * @return 是否成功
      */
-    R forgetPassword(String code, String email, String password);
+    R forgetPassword(String otp, String email, String password);
 
     /**
      * 更新用户密码
@@ -71,4 +77,15 @@ public interface IUserService extends IService<User> {
      * @description:
      */
     int updateUserDetail(UpdateUserDto updateUserDto);
+
+
+    String createTemporaryUser(UserNameRequest userNameRequest);
+
+    String claimTemporaryUser(ClaimUserDto claimUserDto);
+
+    UserInfoDto resolveToken(TokenRequest tokenRequest);
+
+    UserInfoDto searchUserWithUniqueName(UniqueNameRequest uniqueNameRequest);
+
+    UserSetting getUserSettings(User user);
 }
