@@ -1,6 +1,7 @@
 package com.linkhub.portal.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.linkhub.common.model.dto.message.SendMsgDto;
 import com.linkhub.common.model.pojo.Message;
 
 /**
@@ -13,4 +14,8 @@ import com.linkhub.common.model.pojo.Message;
  */
 public interface IMessageService extends IService<Message> {
 
+    /**
+    * 发送消息
+    */
+    void sendMessage(SendMsgDto sendMsgDto);
 }

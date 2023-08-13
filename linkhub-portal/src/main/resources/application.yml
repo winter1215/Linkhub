@@ -64,12 +64,6 @@ secure:
       - /user/login
       - /user/forget
       - /user/createTemporaryUser
-      - /user/claimTemporaryUser
-      - /user/resolveToken
-      - /user/searchUserWithUniqueName
-      - /user/getUserSettings
-      - /user/getUserInfoList
-      - /userdmlist/addConverse
       - /im/**
 jwt:
   tokenHeader: Authorization #jwt请求头
@@ -86,7 +80,21 @@ redis:
     viewed: 3600 #同一帖子同一用户一小时内是否浏览过
 
 
-oos:
-  accessKey: 9EsxpmzKyHtzgXu3YMoUgcX1zehOPYe5BxNOCzsw
-  secretKey: b0wiyZRPagByg2U7q1ZjcNcGtiITbsj-tpIhKeZI
-  bucket: winter-tower
+# SocketIO配置
+socketio:
+  # SocketIO端口
+  port: 11000
+  # 连接数大小
+  workCount: 100
+  # 允许客户请求
+  allowCustomRequests: true
+  # 协议升级超时时间(毫秒)，默认10秒，HTTP握手升级为ws协议超时时间
+  upgradeTimeout: 10000
+  # Ping消息超时时间(毫秒)，默认60秒，这个时间间隔内没有接收到心跳消息就会发送超时事件
+  pingTimeout: 60000
+  # Ping消息间隔(毫秒)，默认25秒。客户端向服务器发送一条心跳消息间隔
+  pingInterval: 25000
+  # 设置HTTP交互最大内容长度
+  maxHttpContentLength: 1048576
+  # 设置最大每帧处理数据的长度，防止他人利用大数据来攻击服务器
+  maxFramePayloadLength: 1048576

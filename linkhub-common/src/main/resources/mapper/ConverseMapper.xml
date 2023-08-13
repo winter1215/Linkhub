@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.linkhub.common.mapper.ConverseMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.linkhub.common.model.pojo.Converse">
+        <id column="id" property="id" />
+        <result column="converse_id" property="converseId" />
+        <result column="type" property="type" />
+        <result column="member" property="member" />
+        <result column="create_at" property="createAt" />
+        <result column="update_at" property="updateAt" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, converse_id, type, member, create_at, update_at
+    </sql>
+
+</mapper>
