@@ -24,7 +24,7 @@ public class DefaultAuthListener implements AuthorizationListener {
     @Resource
     private JwtTokenUtil tokenUtil;
 
-    private String TOKEN_PARAM = "token";
+    private static final String TOKEN_PARAM = "token";
     @Override
     public boolean isAuthorized(HandshakeData data) {
         String token = data.getSingleUrlParam(TOKEN_PARAM);
