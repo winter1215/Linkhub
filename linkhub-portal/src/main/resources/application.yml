@@ -1,6 +1,7 @@
 server:
   port: 8080
-
+  servlet:
+    context-path: /api
 # knife 增强模式
 knife4j:
   enable: true
