@@ -6,10 +6,14 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.FieldFill;
 import com.baomidou.mybatisplus.annotation.TableField;
 import java.io.Serializable;
+
+import com.linkhub.common.enums.InboxTypeEnum;
+import com.linkhub.common.model.dto.message.SendMsgDto;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import org.apache.commons.lang3.ObjectUtils;
 
 /**
  * <p>
@@ -36,7 +40,7 @@ public class Inbox implements Serializable {
 
     private Boolean readed;
 
-    private Integer conserveId;
+    private String conserveId;
 
     private String messageId;
 
@@ -53,5 +57,23 @@ public class Inbox implements Serializable {
     @TableField(fill = FieldFill.INSERT_UPDATE)
     private LocalDateTime updateAt;
 
+    public static Inbox sendMsgDtoConvertDomain(SendMsgDto sendMsgDto, String mention) {
+        InboxTypeEnum typeEnum =  ObjectUtils.isEmpty(sendMsgDto.getGroupId())
+                ? InboxTypeEnum.DM
+                : InboxTypeEnum.GROUP_MESSAGE;
 
+        Inbox inbox = new Inbox();
+        inbox.setUserId(mention);
+        inbox.setType(typeEnum.getCode());
+        if (typeEnum == InboxTypeEnum.DM) {
+            inbox.setConserveId(sendMsgDto.getConverseId());
+        } else if (typeEnum == InboxTypeEnum.GROUP_MESSAGE){
+            inbox.setConserveId(sendMsgDto.getGroupId());
+        }
+        inbox.setMessageId(sendMsgDto.getMeta().getReply().get_id());
+        inbox.setMessageAuthor(sendMsgDto.getMeta().getReply().getAuthor());
+        inbox.setMessageSnippet(sendMsgDto.getMeta().getReply().getContent());
+        inbox.setMessagePlainContent(sendMsgDto.getPlain());
+        return inbox;
+    }
 }

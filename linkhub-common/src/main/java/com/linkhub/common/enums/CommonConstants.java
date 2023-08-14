@@ -22,4 +22,7 @@ public interface CommonConstants {
     */
     String SORT_ORDER_DESC = "descend";
 
+    String LINKHUB_THREAD_NAME_PREFIX = "lh-thread-";
+    String LINKHUB_THREAD_POOL = "linkHubThreadPool";
+
 }

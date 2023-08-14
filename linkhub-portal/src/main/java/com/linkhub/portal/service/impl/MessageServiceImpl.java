@@ -64,7 +64,6 @@ public class MessageServiceImpl extends ServiceImpl<MessageMapper, Message> impl
         ArrayList<String> converseIds = new ArrayList<>();
         converseIds.add(converseId);
         IMUtil.notify(converseIds, IMNotifyTypeEnum.ROOM_CAST, ClientEventEnum.MESSAGE_ADD, message);
-        // todo: 插入收件箱 (异步)
         iInboxService.insertMsgInbox(sendMsgDto);
 
     }
@@ -84,6 +83,9 @@ public class MessageServiceImpl extends ServiceImpl<MessageMapper, Message> impl
             MESSAGE_BUFFER.clear();
         }
 
+        // 设置消息发送时间
+        message.setCreateAt(LocalDateTime.now());
+        message.setUpdateAt(LocalDateTime.now());
         MESSAGE_BUFFER.add(message);
     }
 
