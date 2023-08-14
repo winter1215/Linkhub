@@ -88,6 +88,12 @@ public class RedisCache
         return operation.get(key);
     }
 
+    public <T> List<T> multiGetCacheObject(final List<String> keys)
+    {
+        ValueOperations<String, T> operation = redisTemplate.opsForValue();
+        return operation.multiGet(keys);
+    }
+
     /**
      * 删除单个对象
      *
