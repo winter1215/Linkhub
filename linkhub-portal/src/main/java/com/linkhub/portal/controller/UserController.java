@@ -3,9 +3,7 @@ package com.linkhub.portal.controller;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.linkhub.common.config.exception.GlobalException;
 import com.linkhub.common.enums.ErrorCode;
-import com.linkhub.common.model.common.TokenRequest;
-import com.linkhub.common.model.common.UniqueNameRequest;
-import com.linkhub.common.model.common.UserNameRequest;
+import com.linkhub.common.model.common.*;
 import com.linkhub.common.model.dto.user.*;
 import com.linkhub.common.model.pojo.User;
 import com.linkhub.common.model.pojo.UserSetting;
@@ -27,6 +25,8 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.constraints.Email;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -152,6 +152,26 @@ public class UserController {
         User user = userDetails.getUser();
         UserSetting userSetting  = userService.getUserSettings(user);
         Map<String, Object> res = MapUtils.convertToMap(userSetting);
+        return R.ok()
+                .data(res);
+    }
+
+    @ApiOperation("批量获取好友信息")
+    @PostMapping("/getUserInfoList")
+    public R getUserInfoList(@RequestBody  UserIdsRequest userIdsRequest) {
+        List<UserInfoDto> userInfoDtoList = userService.getUserInfoList(userIdsRequest);
+        Map<String, Object> res = MapUtils.convertToMap(userInfoDtoList);
+        return R.ok()
+                .data(res);
+    }
+
+    @ApiOperation("添加好友")
+    @PostMapping("/add")
+    public R addFriend(@RequestBody  FriendRequest friendRequest) {
+        LinkhubUserDetails userDetails = SecurityUtils.getLoginObj();
+        User user = userDetails.getUser();
+        AddFriendDto addFriendDto = userService.addFriend(user, friendRequest);
+        Map<String, Object> res = MapUtils.convertToMap(userInfoDtoList);
         return R.ok()
                 .data(res);
     }

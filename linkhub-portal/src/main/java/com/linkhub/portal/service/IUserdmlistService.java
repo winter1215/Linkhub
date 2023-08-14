@@ -1,5 +1,8 @@
 package com.linkhub.portal.service;
 
+import com.linkhub.common.model.common.ConverseIdRequest;
+import com.linkhub.common.model.dto.userdmlist.UserdmlistDto;
+import com.linkhub.common.model.pojo.User;
 import com.linkhub.common.model.pojo.Userdmlist;
 import com.baomidou.mybatisplus.extension.service.IService;
 
@@ -13,4 +16,5 @@ import com.baomidou.mybatisplus.extension.service.IService;
  */
 public interface IUserdmlistService extends IService<Userdmlist> {
 
+    UserdmlistDto addConverse(User user, ConverseIdRequest converseIdRequest);
 }
