@@ -75,8 +75,7 @@ public class UserController {
     public R login(@RequestBody @Validated LoginForm loginForm){
         String token = userService.login(loginForm.getEmail(), loginForm.getPassword());
         return R.ok()
-                .data("token",token)
-                .data("tokenHead",tokenHead);
+                .data("token",tokenHead + token);
     }
 
     @ApiOperation("忘记密码")
@@ -160,17 +159,6 @@ public class UserController {
     @PostMapping("/getUserInfoList")
     public R getUserInfoList(@RequestBody  UserIdsRequest userIdsRequest) {
         List<UserInfoDto> userInfoDtoList = userService.getUserInfoList(userIdsRequest);
-        Map<String, Object> res = MapUtils.convertToMap(userInfoDtoList);
-        return R.ok()
-                .data(res);
-    }
-
-    @ApiOperation("添加好友")
-    @PostMapping("/add")
-    public R addFriend(@RequestBody  FriendRequest friendRequest) {
-        LinkhubUserDetails userDetails = SecurityUtils.getLoginObj();
-        User user = userDetails.getUser();
-        AddFriendDto addFriendDto = userService.addFriend(user, friendRequest);
         Map<String, Object> res = MapUtils.convertToMap(userInfoDtoList);
         return R.ok()
                 .data(res);

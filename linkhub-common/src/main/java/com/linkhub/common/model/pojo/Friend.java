@@ -1,6 +1,7 @@
 package com.linkhub.common.model.pojo;
 
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import java.io.Serializable;
 import io.swagger.annotations.ApiModel;
@@ -26,9 +27,11 @@ public class Friend implements Serializable {
     @TableId(value = "id", type = IdType.ASSIGN_UUID)
     private String id;
 
+    @TableField("`from`")
     @ApiModelProperty(value = "主角")
     private String from;
 
+    @TableField("`to`")
     @ApiModelProperty(value = "主角的好友")
     private String to;
 
