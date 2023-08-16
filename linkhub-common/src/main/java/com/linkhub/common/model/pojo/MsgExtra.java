@@ -27,7 +27,7 @@ public class MsgExtra implements Serializable {
     @TableId(type = IdType.ASSIGN_UUID)
     private String id;
 
-    private String msgId;
+    private Long msgId;
 
     @ApiModelProperty(value = "reaction name")
     private String name;

@@ -26,8 +26,10 @@ public class R {
     @ApiModelProperty("返回消息")
     private String message;
     @ApiModelProperty("返回数据")
-    private Map<String, Object> data = new HashMap<>();
+    private Object data;
 
+    // 1. data 链式调用 (Map)
+    // 2. data 无嵌套 (object 任意子类)
 
 
     // 不允许通过直接实例化 R 类 ， 建议使用 R.ok() , R.error().data().... 来链式编程
@@ -65,10 +67,21 @@ public class R {
     }
     //链式编程在放map的Data里似乎特别好用 ， 使用 map 的好处在于 一些原本用 多种场景的dto类，现在只需要在map里设置不同的 key来实现
 
-    public R data(String key, Object value){
-        this.data.put(key, value);
+    public R setData(Object data) {
+        this.data = data;
         return this;
     }
+
+    public R data(String key, Object value){
+        if (!(this.data instanceof Map)) {
+            this.data = new HashMap<String, Object>();
+            ((HashMap<String, Object>)this.data).put(key, value);
+        } else {
+            ((HashMap<String, Object>)this.data).put(key, value);
+        }
+        return this;
+    }
+
     public R data(Map<String, Object> map){
         this.setData(map);
         return this;

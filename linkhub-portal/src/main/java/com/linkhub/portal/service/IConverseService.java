@@ -19,6 +19,6 @@ public interface IConverseService extends IService<Converse> {
     /**
     * 获取用户的 converseIds (dmConverseIds, groupIds, paneIds)
     */
-    Set<String> getUserAllConverseIds();
+    Set<String> getUserAllConverseIds(String userId);
 
 }

@@ -100,7 +100,7 @@ public class JwtTokenUtil {
      * @param userDetails 登录用户细节
      * @return true表示有效，false表示无效
      */
-    public boolean validateToken(String token, UserDetails userDetails) {
+    public boolean validateToken(String token) {
         return !isTokenExpired(token);
     }
 

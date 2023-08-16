@@ -51,4 +51,71 @@
         from message m left join msg_extra mr on m.id = mr.msg_id where m.id = #{id}
     </select>
 
+    <select id="fetchConverseMessage" resultMap="MsgVoMap">
+
+        select m.id, content, m.author as msgAuthor, mr.author as reactionAuthor, converse_id, has_recall, reply_id, reply_content, reply_author, group_id,
+               mr.name, mr.mention
+        from message m left join msg_extra mr on m.id = mr.msg_id
+        where m.converse_id = #{converseId}
+        <if test="startId != null and startId != 0">
+            and m.id &lt; #{startId}
+        </if>
+        order by m.id desc
+        limit #{limit}
+    </select>
+
+    <select id="fetchNearbyMessage" resultMap="MsgVoMap">
+        SELECT * FROM (
+        SELECT
+        m.id,
+        content,
+        m.author AS msgAuthor,
+        mr.author AS reactionAuthor,
+        converse_id,
+        has_recall,
+        reply_id,
+        reply_content,
+        reply_author,
+        group_id,
+        mr.name,
+        mr.mention
+        FROM
+        message m
+        LEFT JOIN msg_extra mr ON m.id = mr.msg_id
+        WHERE
+        m.converse_id = #{converseId}
+        AND m.id &lt;= #{messageId}
+        ORDER BY
+        m.id DESC
+        LIMIT #{num}
+        ) AS before_result
+        UNION ALL
+        SELECT * FROM (
+        SELECT
+        m.id,
+        content,
+        m.author AS msgAuthor,
+        mr.author AS reactionAuthor,
+        converse_id,
+        has_recall,
+        reply_id,
+        reply_content,
+        reply_author,
+        group_id,
+        mr.name,
+        mr.mention
+        FROM
+        message m
+        LEFT JOIN msg_extra mr ON m.id = mr.msg_id
+        WHERE
+        m.converse_id = #{converseId}
+        AND m.id &gt; #{messageId}
+        ORDER BY
+        m.id DESC
+        LIMIT #{num}
+        ) AS before_result
+        ORDER BY id
+    </select>
+
+
 </mapper>

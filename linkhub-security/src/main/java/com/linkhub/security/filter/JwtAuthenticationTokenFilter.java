@@ -44,7 +44,7 @@ public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
             // context 绑定了一个线程(如果当前线程首次请求没有 set userDetail, 则 set, 方便后续请求调用)
             if(username != null && SecurityContextHolder.getContext().getAuthentication() == null){
                 UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-                if(tokenUtil.validateToken(token,userDetails)){
+                if(tokenUtil.validateToken(token)){
                     UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
                     authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                     LOGGER.info("Authenticated User:[username: {}]", username);

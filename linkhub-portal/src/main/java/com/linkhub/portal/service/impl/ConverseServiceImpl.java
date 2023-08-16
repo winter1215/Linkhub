@@ -32,10 +32,7 @@ public class ConverseServiceImpl extends ServiceImpl<ConverseMapper, Converse> i
     private GroupMemberMapper groupMemberMapper;
 
     @Override
-    public Set<String> getUserAllConverseIds() {
-        LinkhubUserDetails user = SecurityUtils.getLoginObj();
-        String userId = user.getUser().getId();
-
+    public Set<String> getUserAllConverseIds(String userId) {
         List<Converse> converses = baseMapper.selectList(
                 new LambdaQueryWrapper<Converse>()
                         .eq(Converse::getMember, userId)
@@ -48,7 +45,7 @@ public class ConverseServiceImpl extends ServiceImpl<ConverseMapper, Converse> i
                         .select(GroupMember::getGroupId));
         List<String> groupIds = groups.stream().map(GroupMember::getGroupId).collect(Collectors.toList());
 
-        // todo: panel id
+        // todo: panel id, group 的表还没创建完
         Set<String> res = new HashSet<>(dmConverseIds);
         res.addAll(groupIds);
         return res;

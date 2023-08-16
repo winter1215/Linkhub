@@ -2,7 +2,11 @@ package com.linkhub.portal.controller;
 
 
 import cn.hutool.log.Log;
+import com.linkhub.common.model.dto.message.FetchConverseMessageDto;
+import com.linkhub.common.model.dto.message.FetchNearbyMessageDto;
 import com.linkhub.common.model.dto.message.SendMsgDto;
+import com.linkhub.common.model.pojo.Message;
+import com.linkhub.common.model.vo.MessageVo;
 import com.linkhub.common.utils.R;
 import com.linkhub.portal.service.IInboxService;
 import com.linkhub.portal.service.IMessageService;
@@ -11,6 +15,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import java.util.List;
 
 /**
  * <p>
@@ -26,14 +31,23 @@ import javax.annotation.Resource;
 public class MessageController {
     @Resource
     private IMessageService messageService;
-    @Resource
-    private IInboxService inboxService;
-
 
     @PostMapping("sendMessage")
     public R sendMessage(@RequestBody SendMsgDto sendMsgDto) {
         messageService.sendMessage(sendMsgDto);
         return R.ok();
+    }
+
+    @PostMapping("fetchConverseMessage")
+    public R fetchConverseMessage(@RequestBody FetchConverseMessageDto fetchConverseMessageDto) {
+        List<MessageVo> messages = messageService.fetchConverseMessage(fetchConverseMessageDto);
+        return R.ok().setData(messages);
+    }
+
+    @PostMapping("fetchNearbyMessage")
+    public R fetchNearbyMessage(@RequestBody FetchNearbyMessageDto fetchNearbyMessageDto) {
+        List<MessageVo> messages = messageService.fetchNearbyMessage(fetchNearbyMessageDto);
+        return R.ok().setData(messages);
     }
 
 

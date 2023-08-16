@@ -2,13 +2,17 @@ package com.linkhub.portal.service.impl;
 
 import com.linkhub.common.config.exception.GlobalException;
 import com.linkhub.common.enums.ClientEventEnum;
+import com.linkhub.common.enums.CommonConstants;
 import com.linkhub.common.enums.ErrorCode;
 import com.linkhub.common.enums.IMNotifyTypeEnum;
 import com.linkhub.common.mapper.MessageMapper;
+import com.linkhub.common.model.dto.message.FetchConverseMessageDto;
+import com.linkhub.common.model.dto.message.FetchNearbyMessageDto;
 import com.linkhub.common.model.dto.message.SendMsgDto;
 import com.linkhub.common.model.pojo.GroupMember;
 import com.linkhub.common.model.pojo.Message;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.linkhub.common.model.vo.MessageVo;
 import com.linkhub.portal.im.util.IMUtil;
 import com.linkhub.portal.service.IGroupService;
 import com.linkhub.portal.service.IInboxService;
@@ -64,9 +68,33 @@ public class MessageServiceImpl extends ServiceImpl<MessageMapper, Message> impl
         ArrayList<String> converseIds = new ArrayList<>();
         converseIds.add(converseId);
         IMUtil.notify(converseIds, IMNotifyTypeEnum.ROOM_CAST, ClientEventEnum.MESSAGE_ADD, message);
+        // 更新收件箱(@ sb)
         iInboxService.insertMsgInbox(sendMsgDto);
-
     }
+
+    @Override
+    public List<MessageVo> fetchConverseMessage(FetchConverseMessageDto fetchConverseMessageDto) {
+        String converseId = fetchConverseMessageDto.getConverseId();
+        Long startId = fetchConverseMessageDto.getStartId();
+        return baseMapper.fetchConverseMessage(converseId, startId, CommonConstants.CONVERSE_MESSAGE_LIMIT);
+    }
+
+    @Override
+    public List<MessageVo> fetchNearbyMessage(FetchNearbyMessageDto fetchNearbyMessageDto) {
+        String converseId = fetchNearbyMessageDto.getConverseId();
+        Long messageId = fetchNearbyMessageDto.getMessageId();
+        Integer num = fetchNearbyMessageDto.getNum();
+
+        if (num == null || num.equals(0)) {
+            num = CommonConstants.CONVERSE_NEARBY_MESSAGE_LIMIT;
+        }
+        return baseMapper.fetchNearbyMessage(converseId, messageId, num);
+    }
+
+
+    /**
+    * 异步处理发送消息的实例化
+    */
     private void asyncHandleMessage(Message message) {
         if (MESSAGE_BUFFER.size() >= BATCH_SIZE) {
             // 拷贝

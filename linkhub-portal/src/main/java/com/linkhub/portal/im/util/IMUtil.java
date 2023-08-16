@@ -6,12 +6,14 @@ import com.corundumstudio.socketio.SocketIOServer;
 import com.linkhub.common.config.redis.RedisCache;
 import com.linkhub.common.enums.ClientEventEnum;
 import com.linkhub.common.enums.IMNotifyTypeEnum;
+import com.linkhub.common.model.pojo.User;
 import com.linkhub.portal.security.SecurityUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @author winter
@@ -27,6 +29,11 @@ public class IMUtil {
     public IMUtil(SocketIOServer server, RedisCache redisCache) {
         IMUtil.server = server;
         IMUtil.redisCache = redisCache;
+    }
+
+    public static String getUserIdByClient(SocketIOClient client) {
+        User user =  (User)client.get("user");
+        return user == null ? "" : user.getId();
     }
 
     /**
@@ -106,16 +113,9 @@ public class IMUtil {
     /**
     * 检查用户在线情况
     */
-    public static Map<String, Boolean> checkUserOnline(List<String> userIds) {
+    public static List<Boolean> checkUserOnline(List<String> userIds) {
         List<String> userUUIDs = redisCache.multiGetCacheObject(userIds);
-        Map<String, Boolean> map = new HashMap<>();
-        for (int i = 0; i < userIds.size(); i++) {
-            String userId = userIds.get(i);
-            // todo: 这里 redis 没查到返回的 null 吗
-            Boolean isOnline = ObjectUtils.isNotEmpty(userUUIDs.get(i));
-            map.put(userId, isOnline);
-        }
-        return map;
+        return userUUIDs.stream().map(ObjectUtils::isNotEmpty).collect(Collectors.toList());
     }
 
 }

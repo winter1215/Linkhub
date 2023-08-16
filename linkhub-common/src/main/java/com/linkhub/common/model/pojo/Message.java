@@ -28,9 +28,9 @@ public class Message implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @ApiModelProperty(value = "uuid")
-    @TableId(type = IdType.ASSIGN_UUID)
-    private String id;
+    @ApiModelProperty(value = "snow")
+    @TableId(type = IdType.ASSIGN_ID)
+    private Long id;
 
     private String content;
 

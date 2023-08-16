@@ -25,4 +25,10 @@ public interface CommonConstants {
     String LINKHUB_THREAD_NAME_PREFIX = "lh-thread-";
     String LINKHUB_THREAD_POOL = "linkHubThreadPool";
 
+    /**
+    * 拉取一个会话消息的长度
+    */
+    int CONVERSE_MESSAGE_LIMIT = 50;
+
+    Integer CONVERSE_NEARBY_MESSAGE_LIMIT = 5;
 }
