@@ -16,9 +16,11 @@ import java.util.List;
  */
 public interface MessageMapper extends BaseMapper<Message> {
 
-    MessageVo findOneById(String id);
+    MessageVo findMsgVoById(Long id);
 
     List<MessageVo> fetchConverseMessage(String converseId, Long startId, int limit);
 
     List<MessageVo> fetchNearbyMessage(String converseId, Long messageId, Integer num);
+
+    List<String> selectConverseLastMessages(List<String> converseIds);
 }

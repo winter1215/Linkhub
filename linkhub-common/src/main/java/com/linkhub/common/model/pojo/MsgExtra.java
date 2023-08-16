@@ -1,9 +1,12 @@
 package com.linkhub.common.model.pojo;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
+import com.linkhub.common.model.dto.message.SendMsgDto;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -37,4 +40,14 @@ public class MsgExtra implements Serializable {
     private String mention;
 
 
+    public static List<MsgExtra> convertToDomain(SendMsgDto sendMsgDto) {
+        List<String> mentions = sendMsgDto.getMeta().getMentions();
+        List<MsgExtra> res = new ArrayList<>();
+        mentions.forEach(item -> {
+            MsgExtra msgExtra = new MsgExtra();
+            msgExtra.setMention(item);
+            res.add(msgExtra);
+        });
+        return res;
+    }
 }
