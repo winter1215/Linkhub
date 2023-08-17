@@ -9,9 +9,8 @@
         <result column="owner" property="owner" />
         <result column="description" property="description" />
         <result column="avatar" property="avatar" />
-        <result column="hide_member_info" property="hideMemberInfo" />
-        <result column="group_background_image" property="groupBackgroundImage" />
-        <result column="fallback_permission" property="fallbackPermission" />
+        <result column="config" property="config" typeHandler="com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler"/>
+        <result column="fallback_permission" property="fallbackPermission" typeHandler="com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler"/>
         <result column="create_at" property="createAt" />
         <result column="update_at" property="updateAt" />
     </resultMap>

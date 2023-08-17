@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.linkhub.common.mapper.GroupPanelMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.linkhub.common.model.pojo.GroupPanel">
+        <id column="id" property="id" />
+        <result column="group_id" property="groupId" />
+        <result column="name" property="name" />
+        <result column="type" property="type" />
+        <result column="parent_id" property="parentId" />
+        <result column="meta" property="meta" typeHandler="com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler"/>
+        <result column="provider" property="provider" />
+        <result column="pluginPaneName" property="pluginPanelName" />
+        <result column="creat_at" property="creatAt" />
+        <result column="update_at" property="updateAt" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, group_id, name, type, parent_id, meta, provider, pluginPaneName, creat_at, update_at
+    </sql>
+
+</mapper>

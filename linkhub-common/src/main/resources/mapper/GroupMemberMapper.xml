@@ -7,7 +7,7 @@
         <id column="id" property="id" />
         <result column="group_id" property="groupId" />
         <result column="user_id" property="userId" />
-        <result column="roles" property="roles" />
+        <result column="roles" property="roles" typeHandler="com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler"/>
         <result column="mute_util" property="muteUtil" />
     </resultMap>
 

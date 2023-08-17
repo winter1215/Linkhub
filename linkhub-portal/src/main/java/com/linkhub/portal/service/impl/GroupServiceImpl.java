@@ -52,6 +52,8 @@ public class GroupServiceImpl extends ServiceImpl<GroupMapper, Group> implements
 
     @Override
     public boolean checkUserIsOwner() {
+        Group group = baseMapper.selectById("1");
+        System.out.println(group);
         // todo: 待补充
         return true;
     }

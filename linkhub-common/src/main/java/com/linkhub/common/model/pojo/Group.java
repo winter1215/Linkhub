@@ -1,11 +1,13 @@
 package com.linkhub.common.model.pojo;
 
-import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.*;
+
 import java.time.LocalDateTime;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.FieldFill;
-import com.baomidou.mybatisplus.annotation.TableField;
 import java.io.Serializable;
+import java.util.List;
+
+import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
+import com.linkhub.common.model.dto.message.SendMsgDto;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -22,6 +24,7 @@ import lombok.EqualsAndHashCode;
 @Data
 @EqualsAndHashCode(callSuper = false)
 @ApiModel(value="Group对象", description="群组 info")
+@TableName(value = "`group`", autoResultMap = true)
 public class Group implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -40,14 +43,12 @@ public class Group implements Serializable {
     @ApiModelProperty(value = "群组头像")
     private String avatar;
 
-    @ApiModelProperty(value = "是否隐藏用户的随机码")
-    private Boolean hideMemberInfo;
-
-    @ApiModelProperty(value = "群组背景图片")
-    private String groupBackgroundImage;
+    @TableField(typeHandler = JacksonTypeHandler.class)
+    private Config config;
 
     @ApiModelProperty(value = "权限列表: Enum, Json")
-    private String fallbackPermission;
+    @TableField(typeHandler = JacksonTypeHandler.class)
+    private List<String> fallbackPermission;
 
     @TableField(fill = FieldFill.INSERT)
     private LocalDateTime createAt;
@@ -55,5 +56,12 @@ public class Group implements Serializable {
     @TableField(fill = FieldFill.INSERT_UPDATE)
     private LocalDateTime updateAt;
 
+    @Data
+    public static class Config {
+        @ApiModelProperty(value = "是否隐藏用户的随机码")
+        private Boolean hideMemberInfo;
 
+        @ApiModelProperty(value = "群组背景图片")
+        private String groupBackgroundImage;
+    }
 }
