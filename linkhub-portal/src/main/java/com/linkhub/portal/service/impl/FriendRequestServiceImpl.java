@@ -4,7 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.linkhub.common.config.exception.GlobalException;
 import com.linkhub.common.enums.ErrorCode;
 import com.linkhub.common.mapper.FriendMapper;
-import com.linkhub.common.model.common.OptFriendRequest;
+import com.linkhub.common.model.dto.friend.OptFriendRequest;
 import com.linkhub.common.model.pojo.Friend;
 import com.linkhub.common.model.pojo.FriendRequest;
 import com.linkhub.common.mapper.FriendRequestMapper;
@@ -39,7 +39,7 @@ public class FriendRequestServiceImpl extends ServiceImpl<FriendRequestMapper, F
     public FriendRequest addFriend(FriendRequest friendRequest) {
         // 判空
         if (ObjectUtils.isEmpty(friendRequest) || StringUtils.isEmpty(friendRequest.getFrom()) || StringUtils.isEmpty(friendRequest.getTo())) {
-            throw new GlobalException(ErrorCode.PARAMS_ERROR.getMessage(), ErrorCode.PARAMS_ERROR.getCode());
+            throw new GlobalException(ErrorCode.PARAMS_ERROR);
         }
 
         // 判断是否添加自己
@@ -77,24 +77,23 @@ public class FriendRequestServiceImpl extends ServiceImpl<FriendRequestMapper, F
     public List<FriendRequest> allRelated(User user) {
         // 判空
         if (ObjectUtils.isEmpty(user) ||StringUtils.isEmpty(user.getId())) {
-            throw new GlobalException(ErrorCode.PARAMS_ERROR.getMessage(), ErrorCode.PARAMS_ERROR.getCode());
+            throw new GlobalException(ErrorCode.PARAMS_ERROR);
         }
         // 根据用户的userId，查询所有to为该userId的friendRequest
         LambdaQueryWrapper<FriendRequest> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(FriendRequest::getTo, user.getId());
-        List<FriendRequest> friendRequestList = baseMapper.selectList(wrapper);
-        return friendRequestList;
+        return baseMapper.selectList(wrapper);
     }
 
     @Override
-    public int accept(User user, OptFriendRequest optFriendRequest) {
+    public int accept(String userId, OptFriendRequest optFriendRequest) {
         // 判空
-        if (ObjectUtils.isEmpty(user) ||StringUtils.isEmpty(user.getId())) {
-            throw new GlobalException(ErrorCode.PARAMS_ERROR.getMessage(), ErrorCode.PARAMS_ERROR.getCode());
+        if (StringUtils.isEmpty(userId)) {
+            throw new GlobalException(ErrorCode.PARAMS_ERROR);
         }
 
         if (ObjectUtils.isEmpty(optFriendRequest) || StringUtils.isEmpty(optFriendRequest.getRequestId())) {
-            throw new GlobalException(ErrorCode.PARAMS_ERROR.getMessage(), ErrorCode.PARAMS_ERROR.getCode());
+            throw new GlobalException(ErrorCode.PARAMS_ERROR);
         }
 
         // 在friendRequest中查找是否存在
@@ -107,8 +106,8 @@ public class FriendRequestServiceImpl extends ServiceImpl<FriendRequestMapper, F
         }
 
         // 判断一下接收好友请求的人和数据库中是否对应
-        if (!friendRequest.getTo().equals(user.getId())) {
-            throw new GlobalException(ErrorCode.PARAMS_ERROR.getMessage(), ErrorCode.PARAMS_ERROR.getCode());
+        if (!friendRequest.getTo().equals(userId)) {
+            throw new GlobalException(ErrorCode.PARAMS_ERROR);
         }
 
         // 存入Friend，两条记录
@@ -125,14 +124,14 @@ public class FriendRequestServiceImpl extends ServiceImpl<FriendRequestMapper, F
     }
 
     @Override
-    public int deny(User user, OptFriendRequest optFriendRequest) {
+    public int deny(String userId, OptFriendRequest optFriendRequest) {
         // 判空
-        if (ObjectUtils.isEmpty(user) ||StringUtils.isEmpty(user.getId())) {
-            throw new GlobalException(ErrorCode.PARAMS_ERROR.getMessage(), ErrorCode.PARAMS_ERROR.getCode());
+        if (StringUtils.isEmpty(userId)) {
+            throw new GlobalException(ErrorCode.PARAMS_ERROR);
         }
 
         if (ObjectUtils.isEmpty(optFriendRequest) || StringUtils.isEmpty(optFriendRequest.getRequestId())) {
-            throw new GlobalException(ErrorCode.PARAMS_ERROR.getMessage(), ErrorCode.PARAMS_ERROR.getCode());
+            throw new GlobalException(ErrorCode.PARAMS_ERROR);
         }
 
         // 在friendRequest中查找是否存在
@@ -145,8 +144,8 @@ public class FriendRequestServiceImpl extends ServiceImpl<FriendRequestMapper, F
         }
 
         // 判断一下拒绝好友请求的人和数据库中是否对应
-        if (!friendRequest.getTo().equals(user.getId())) {
-            throw new GlobalException(ErrorCode.PARAMS_ERROR.getMessage(), ErrorCode.PARAMS_ERROR.getCode());
+        if (!friendRequest.getTo().equals(userId)) {
+            throw new GlobalException(ErrorCode.PARAMS_ERROR);
         }
 
         LambdaQueryWrapper<FriendRequest> deleteWrapper = new LambdaQueryWrapper<>();
@@ -155,14 +154,14 @@ public class FriendRequestServiceImpl extends ServiceImpl<FriendRequestMapper, F
     }
 
     @Override
-    public int cancel(User user, OptFriendRequest optFriendRequest) {
+    public int cancel(String userId, OptFriendRequest optFriendRequest) {
         // 判空
-        if (ObjectUtils.isEmpty(user) ||StringUtils.isEmpty(user.getId())) {
-            throw new GlobalException(ErrorCode.PARAMS_ERROR.getMessage(), ErrorCode.PARAMS_ERROR.getCode());
+        if (StringUtils.isEmpty(userId)) {
+            throw new GlobalException(ErrorCode.PARAMS_ERROR);
         }
 
         if (ObjectUtils.isEmpty(optFriendRequest) || StringUtils.isEmpty(optFriendRequest.getRequestId())) {
-            throw new GlobalException(ErrorCode.PARAMS_ERROR.getMessage(), ErrorCode.PARAMS_ERROR.getCode());
+            throw new GlobalException(ErrorCode.PARAMS_ERROR);
         }
 
         // 在friendRequest中查找是否存在
@@ -175,8 +174,8 @@ public class FriendRequestServiceImpl extends ServiceImpl<FriendRequestMapper, F
         }
 
         // 判断一下取消好友请求的人和数据库中是否对应
-        if (!friendRequest.getFrom().equals(user.getId())) {
-            throw new GlobalException(ErrorCode.PARAMS_ERROR.getMessage(), ErrorCode.PARAMS_ERROR.getCode());
+        if (!friendRequest.getFrom().equals(userId)) {
+            throw new GlobalException(ErrorCode.PARAMS_ERROR);
         }
 
         // 删除请求

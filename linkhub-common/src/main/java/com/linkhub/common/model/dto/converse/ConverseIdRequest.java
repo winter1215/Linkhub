@@ -1,4 +1,4 @@
-package com.linkhub.common.model.common;
+package com.linkhub.common.model.dto.converse;
 
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;

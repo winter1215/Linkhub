@@ -7,14 +7,14 @@ import com.linkhub.common.model.common.*;
 import com.linkhub.common.model.dto.user.*;
 import com.linkhub.common.model.pojo.User;
 import com.linkhub.common.model.pojo.UserSetting;
+import com.linkhub.common.model.vo.UserSettingVo;
 import com.linkhub.common.model.vo.UserVo;
 import com.linkhub.common.utils.MapUtils;
 import com.linkhub.common.utils.R;
-import com.linkhub.portal.security.LinkhubUserDetails;
+import com.linkhub.portal.security.SecurityUtils;
 import com.linkhub.portal.service.IUserService;
 
 import com.linkhub.portal.service.impl.EmailService;
-import com.linkhub.security.util.SecurityUtils;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
@@ -25,7 +25,6 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.constraints.Email;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -93,11 +92,10 @@ public class UserController {
     @ApiOperation("获取用户详情")
     @GetMapping("/userDetail")
     public R getUserDetail(){
-        LinkhubUserDetails userDetails = SecurityUtils.getLoginObj();
-        User user = userDetails.getUser();
+        User user = SecurityUtils.getLoginObj();
         UserVo userVo = new UserVo();
         BeanUtils.copyProperties(user, userVo);
-        return R.ok().data("data", userVo);
+        return R.ok().setData(userVo);
     }
 
     @ApiOperation("更新用户信息")
@@ -130,37 +128,42 @@ public class UserController {
         UserInfoDto userInfoDto  = userService.resolveToken(tokenRequest);
         Map<String, Object> res = MapUtils.convertToMap(userInfoDto);
         return R.ok()
-                .data(res)
-                .data("token", tokenRequest.getToken()); // todo: 这里会出现两个data，转map?
+                .setData(res)
+                .data("token", tokenRequest.getToken());
     }
 
     @ApiOperation("使用唯一标识名搜索用户名")
     @PostMapping("/searchUserWithUniqueName")
     public R searchUserWithUniqueName(@RequestBody UniqueNameRequest uniqueNameRequest) {
-        // uniqueName 由 nickname + '-' + discriminator 组成 注意 # 在URL中会被解析为位置标志符，拿不到
+        // uniqueName 由 nickname + '#' + discriminator
         UserInfoDto userInfoDto  = userService.searchUserWithUniqueName(uniqueNameRequest);
-        Map<String, Object> res = MapUtils.convertToMap(userInfoDto);
         return R.ok()
-                .data(res);
+                .setData(userInfoDto);
     }
 
     @ApiOperation("获取用户设置")
     @GetMapping("/getUserSettings")
     public R getUserSettings() {
-        LinkhubUserDetails userDetails = SecurityUtils.getLoginObj();
-        User user = userDetails.getUser();
-        UserSetting userSetting  = userService.getUserSettings(user);
-        Map<String, Object> res = MapUtils.convertToMap(userSetting);
+        String userId = SecurityUtils.getLoginUserId();
+        UserSetting userSetting  = userService.getUserSettings(userId);
         return R.ok()
-                .data(res);
+                .setData(userSetting);
     }
 
     @ApiOperation("批量获取好友信息")
     @PostMapping("/getUserInfoList")
-    public R getUserInfoList(@RequestBody  UserIdsRequest userIdsRequest) {
+    public R getUserInfoList(@RequestBody UserIdsRequest userIdsRequest) {
         List<UserInfoDto> userInfoDtoList = userService.getUserInfoList(userIdsRequest);
-        Map<String, Object> res = MapUtils.convertToMap(userInfoDtoList);
         return R.ok()
-                .data(res);
+                .setData(userInfoDtoList);
+    }
+
+    @ApiOperation("设置用户设置")
+    @PostMapping("/setUserSettings")
+    public R setUserSettings(@RequestBody UserSettingsRequest userSettingsRequest) {
+        String userId = SecurityUtils.getLoginUserId();
+        UserSettingVo userSettingVo = userService.setUserSettings(userId, userSettingsRequest);
+        return R.ok()
+                .setData(userSettingVo);
     }
 }

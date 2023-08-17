@@ -18,6 +18,6 @@ import java.util.List;
 public class IndexController {
     @PostMapping("checkUserOnline")
     public R checkUserOnline(@RequestBody List<String> userIds) {
-        return R.ok().data("data", IMUtil.checkUserOnline(userIds));
+        return R.ok().setData(IMUtil.checkUserOnline(userIds));
     }
 }

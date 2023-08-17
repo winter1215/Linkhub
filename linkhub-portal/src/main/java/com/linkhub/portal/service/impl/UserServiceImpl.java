@@ -2,16 +2,19 @@ package com.linkhub.portal.service.impl;
 
 import cn.hutool.core.util.RandomUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.linkhub.common.config.exception.GlobalException;
 import com.linkhub.common.config.redis.RedisCache;
 import com.linkhub.common.enums.ErrorCode;
 import com.linkhub.common.enums.RedisPrefix;
 import com.linkhub.common.mapper.UserSettingMapper;
 import com.linkhub.common.model.common.*;
+
 import com.linkhub.common.model.dto.user.*;
 import com.linkhub.common.model.pojo.User;
 import com.linkhub.common.mapper.UserMapper;
 import com.linkhub.common.model.pojo.UserSetting;
+import com.linkhub.common.model.vo.UserSettingVo;
 import com.linkhub.common.utils.R;
 import com.linkhub.portal.security.LinkhubUserDetails;
 import com.linkhub.portal.service.IUserCacheService;
@@ -137,7 +140,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
             SecurityContextHolder.getContext().setAuthentication(authToken);
             return jwtTokenUtil.generateToken(userDetails);
         }catch (AuthenticationException e){
-            throw new GlobalException(ErrorCode.USERNAME_PASSWORD_ERROR.getMessage(), ErrorCode.USERNAME_PASSWORD_ERROR.getCode());
+            throw new GlobalException(ErrorCode.USERNAME_PASSWORD_ERROR);
         }
     }
 
@@ -215,10 +218,10 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
     public R updatePassword(String oldPassword, String newPassword) {
         LinkhubUserDetails user = SecurityUtils.getLoginObj();
         if(user == null){
-            throw new GlobalException(ErrorCode.NO_AUTH_ERROR.getMessage(),ErrorCode.NO_AUTH_ERROR.getCode());
+            throw new GlobalException(ErrorCode.NO_AUTH_ERROR);
         }
         if(!passwordEncoder.matches(oldPassword,user.getUser().getPassword())){   //旧密码不匹配
-            throw new GlobalException(ErrorCode.PASSWORD_ERROR.getMessage(),ErrorCode.PARAMS_ERROR.getCode());
+            throw new GlobalException(ErrorCode.PASSWORD_ERROR);
         }
         user.getUser().setPassword(passwordEncoder.encode(newPassword));
         updateUser(user.getUser());
@@ -307,11 +310,11 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
     @Override
     public UserInfoDto resolveToken(TokenRequest tokenRequest) {
         if (ObjectUtils.isEmpty(tokenRequest) ||StringUtils.isBlank(tokenRequest.getToken()) || StringUtils.isEmpty(tokenRequest.getToken())) {
-            throw new GlobalException(ErrorCode.PARAMS_ERROR.getMessage(),ErrorCode.PARAMS_ERROR.getCode());
+            throw new GlobalException(ErrorCode.PARAMS_ERROR);
         }
         String token = tokenRequest.getToken();
         if (!token.startsWith(tokenHead)) {
-            throw new GlobalException(ErrorCode.PARAMS_ERROR.getMessage(), ErrorCode.PARAMS_ERROR.getCode());
+            throw new GlobalException(ErrorCode.PARAMS_ERROR);
         }
         token = token.substring(tokenHead.length());
         String email = jwtTokenUtil.getUsernameFromToken(token);
@@ -327,12 +330,12 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
     @Override
     public UserInfoDto searchUserWithUniqueName(UniqueNameRequest uniqueNameRequest) {
         if (ObjectUtils.isEmpty(uniqueNameRequest) || StringUtils.isBlank(uniqueNameRequest.getUniqueName()) || StringUtils.isEmpty(uniqueNameRequest.getUniqueName())) {
-            throw new GlobalException(ErrorCode.PARAMS_ERROR.getMessage(),ErrorCode.PARAMS_ERROR.getCode());
+            throw new GlobalException(ErrorCode.PARAMS_ERROR);
         }
         String uniqueName = uniqueNameRequest.getUniqueName();
         String[] parts = uniqueName.split("#"); // parts[0] 是nickName parts[1]是discriminator
         if (parts.length != 2) {
-            throw new GlobalException(ErrorCode.PARAMS_ERROR.getMessage(),ErrorCode.PARAMS_ERROR.getCode());
+            throw new GlobalException(ErrorCode.PARAMS_ERROR);
         }
         LambdaQueryWrapper<User> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(User::getNickname, parts[0])
@@ -344,12 +347,12 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
     }
 
     @Override
-    public UserSetting getUserSettings(User user) {
-        if (ObjectUtils.isEmpty(user) || StringUtils.isEmpty(user.getId())) {
-            throw new GlobalException(ErrorCode.PARAMS_ERROR.getMessage(),ErrorCode.PARAMS_ERROR.getCode());
+    public UserSetting getUserSettings(String userId) {
+        if (StringUtils.isEmpty(userId)) {
+            throw new GlobalException(ErrorCode.PARAMS_ERROR);
         }
         LambdaQueryWrapper<UserSetting> wrapper = new LambdaQueryWrapper<>();
-        wrapper.eq(UserSetting::getUserId, user.getId());
+        wrapper.eq(UserSetting::getUserId, userId);
         UserSetting userSetting = userSettingMapper.selectOne(wrapper);
         return userSetting;
     }
@@ -357,7 +360,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
     @Override
     public List<UserInfoDto> getUserInfoList(UserIdsRequest userIdsRequest) {
         if (ObjectUtils.isEmpty(userIdsRequest) || ObjectUtils.isEmpty(userIdsRequest.getUserIds())) {
-            throw new GlobalException(ErrorCode.PARAMS_ERROR.getMessage(),ErrorCode.PARAMS_ERROR.getCode());
+            throw new GlobalException(ErrorCode.PARAMS_ERROR);
         }
         LambdaQueryWrapper<User> wrapper = new LambdaQueryWrapper<>();
         wrapper.in(User::getId, userIdsRequest.getUserIds());
@@ -370,5 +373,42 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
                 })
                 .collect(Collectors.toList());
         return userInfoDtoList;
+    }
+
+    @Override
+    public UserSettingVo setUserSettings(String userId, UserSettingsRequest userSettingsRequest) {
+        // 判空
+        if (StringUtils.isEmpty(userId) || ObjectUtils.isEmpty(userSettingsRequest)) {
+            throw new GlobalException(ErrorCode.PARAMS_ERROR.getMessage(),ErrorCode.PARAMS_ERROR.getCode());
+        }
+
+        // 判断用户是否存在
+        LambdaQueryWrapper<UserSetting> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(UserSetting::getUserId, userId);
+        UserSetting userSetting = userSettingMapper.selectOne(wrapper);
+
+        if (ObjectUtils.isEmpty(userSetting)) {
+            throw new GlobalException("用户未找到",ErrorCode.NOT_FOUND_ERROR.getCode());
+        }
+        // 更新
+        LambdaUpdateWrapper<UserSetting> updateWrapper = new LambdaUpdateWrapper<>();
+        updateWrapper.eq(UserSetting::getUserId, userId);
+
+        UserSetting updateSetting = new UserSetting();
+        if (ObjectUtils.isNotEmpty(userSettingsRequest.getNotification())) {
+            updateSetting.setNotification(userSettingsRequest.getNotification());
+        }
+
+        if (ObjectUtils.isNotEmpty(userSettingsRequest.getMessageListVirtualization())) {
+            updateSetting.setMsgListVirtual(userSettingsRequest.getMessageListVirtualization());
+        }
+
+        userSettingMapper.update(updateSetting, updateWrapper);
+
+        UserSettingVo userSettingVo = new UserSettingVo();
+        userSettingVo.setMessageListVirtualization(updateSetting.getMsgListVirtual());
+        userSettingVo.setNotification(updateSetting.getNotification());
+
+        return userSettingVo;
     }
 }

@@ -3,7 +3,7 @@ package com.linkhub.portal.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.linkhub.common.config.exception.GlobalException;
 import com.linkhub.common.enums.ErrorCode;
-import com.linkhub.common.model.common.ConverseIdRequest;
+import com.linkhub.common.model.dto.converse.ConverseIdRequest;
 import com.linkhub.common.model.dto.userdmlist.UserdmlistDto;
 import com.linkhub.common.model.pojo.User;
 import com.linkhub.common.model.pojo.Userdmlist;
@@ -33,27 +33,27 @@ public class UserdmlistServiceImpl extends ServiceImpl<UserdmlistMapper, Userdml
     UserdmlistMapper userdmlistMapper;
 
     @Override
-    public UserdmlistDto addConverse(User user, ConverseIdRequest converseIdRequest) {
+    public UserdmlistDto addConverse(String userId, ConverseIdRequest converseIdRequest) {
         // 先插入，再查所有userId对应的会话返回
-        if (ObjectUtils.isEmpty(user) || ObjectUtils.isEmpty(converseIdRequest)) {
-            throw new GlobalException(ErrorCode.PARAMS_ERROR.getMessage(), ErrorCode.PARAMS_ERROR.getCode());
+        if (ObjectUtils.isEmpty(converseIdRequest)) {
+            throw new GlobalException(ErrorCode.PARAMS_ERROR);
         }
-        if (StringUtils.isEmpty(user.getId()) || StringUtils.isEmpty(converseIdRequest.getConverseId())) {
-            throw new GlobalException(ErrorCode.PARAMS_ERROR.getMessage(), ErrorCode.PARAMS_ERROR.getCode());
+        if (StringUtils.isEmpty(userId) || StringUtils.isEmpty(converseIdRequest.getConverseId())) {
+            throw new GlobalException(ErrorCode.PARAMS_ERROR);
         }
 
         Userdmlist userdmlist = new Userdmlist();
-        userdmlist.setUserId(user.getId());
+        userdmlist.setUserId(userId);
         userdmlist.setConverseId(converseIdRequest.getConverseId());
         baseMapper.insert(userdmlist);
         // 查询userId对应的所有记录
         LambdaQueryWrapper<Userdmlist> wrapper = new LambdaQueryWrapper<>();
-        wrapper.eq(Userdmlist::getUserId, user.getId());
+        wrapper.eq(Userdmlist::getUserId, userId);
         List<Userdmlist> userdmlists = baseMapper.selectList(wrapper);
 
         // 封装
         UserdmlistDto userdmlistDto = new UserdmlistDto();
-        userdmlistDto.setUserId(user.getId());
+        userdmlistDto.setUserId(userId);
         List<String> converseIds = new ArrayList<>();
         for (Userdmlist item : userdmlists) {
             converseIds.add(item.getConverseId());

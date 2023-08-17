@@ -1,4 +1,4 @@
-package com.linkhub.common.model.dto.friend.user;
+package com.linkhub.common.model.dto.user;
 
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -9,8 +9,6 @@ import lombok.Data;
  */
 @Data
 public class UserSettingsRequest {
-
-
     @ApiModelProperty(value = "是否虚拟化")
     private Boolean messageListVirtualization;
 

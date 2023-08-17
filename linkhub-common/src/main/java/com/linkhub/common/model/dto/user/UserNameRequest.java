@@ -1,4 +1,4 @@
-package com.linkhub.common.model.dto.friend.user;
+package com.linkhub.common.model.dto.user;
 
 import lombok.Data;
 

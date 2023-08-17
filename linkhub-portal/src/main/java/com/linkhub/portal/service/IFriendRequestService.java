@@ -1,6 +1,6 @@
 package com.linkhub.portal.service;
 
-import com.linkhub.common.model.common.OptFriendRequest;
+import com.linkhub.common.model.dto.friend.OptFriendRequest;
 import com.linkhub.common.model.pojo.FriendRequest;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.linkhub.common.model.pojo.User;
@@ -21,9 +21,9 @@ public interface IFriendRequestService extends IService<FriendRequest> {
 
     List<FriendRequest> allRelated(User user);
 
-    int accept(User user, OptFriendRequest optFriendRequest);
+    int accept(String userId, OptFriendRequest optFriendRequest);
 
-    int deny(User user, OptFriendRequest optFriendRequest);
+    int deny(String userId, OptFriendRequest optFriendRequest);
 
-    int cancel(User user, OptFriendRequest optFriendRequest);
+    int cancel(String userId, OptFriendRequest optFriendRequest);
 }

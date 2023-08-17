@@ -114,7 +114,8 @@ public class IMUtil {
     * 检查用户在线情况
     */
     public static List<Boolean> checkUserOnline(List<String> userIds) {
-        List<String> userUUIDs = redisCache.multiGetCacheObject(userIds);
+        List<String> list = userIds.stream().map(IMUtil::buildUserOnlineKey).collect(Collectors.toList());
+        List<String> userUUIDs = redisCache.multiGetCacheObject(list);
         return userUUIDs.stream().map(ObjectUtils::isNotEmpty).collect(Collectors.toList());
     }
 

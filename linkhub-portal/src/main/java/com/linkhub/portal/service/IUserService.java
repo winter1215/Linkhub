@@ -5,6 +5,7 @@ import com.linkhub.common.model.dto.user.*;
 import com.linkhub.common.model.pojo.User;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.linkhub.common.model.pojo.UserSetting;
+import com.linkhub.common.model.vo.UserSettingVo;
 import com.linkhub.common.utils.R;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -84,7 +85,9 @@ public interface IUserService extends IService<User> {
 
     UserInfoDto searchUserWithUniqueName(UniqueNameRequest uniqueNameRequest);
 
-    UserSetting getUserSettings(User user);
+    UserSetting getUserSettings(String userId);
 
     List<UserInfoDto> getUserInfoList(UserIdsRequest userIdsRequest);
+
+    UserSettingVo setUserSettings(String userId, UserSettingsRequest userSettingsRequest);
 }
