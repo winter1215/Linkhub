@@ -1,9 +1,8 @@
-package com.linkhub.common.model.common;
+package com.linkhub.common.model.dto.friend.user;
 
 import lombok.Data;
 
 import javax.validation.constraints.NotNull;
-import java.util.List;
 
 /**
  * @author LinkCastling

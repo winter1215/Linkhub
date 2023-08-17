@@ -1,6 +1,5 @@
-package com.linkhub.common.model.dto.user;
+package com.linkhub.common.model.dto.friend.user;
 
-import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import java.time.LocalDateTime;
