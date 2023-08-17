@@ -59,15 +59,15 @@ public class Message implements Serializable {
     @TableField(fill = FieldFill.INSERT_UPDATE)
     private LocalDateTime updateAt;
 
-    public static Message coverToDomain(SendMsgDto sendMsgDto) {
+    public static Message convertToDomain(SendMsgDto sendMsgDto, String author) {
         Message message = new Message();
-        message.setContent(message.getContent());
-        message.setAuthor(message.getAuthor());
-        message.setConverseId(message.converseId);
-        message.setReplyId(message.getReplyId());
-        message.setReplyContent(message.replyContent);
-        message.setReplyAuthor(message.getReplyAuthor());
-        message.setGroupId(message.getGroupId());
+        message.setContent(sendMsgDto.getContent());
+        message.setAuthor(author);
+        message.setConverseId(sendMsgDto.getConverseId());
+        message.setReplyId(sendMsgDto.getMeta().getReply().get_id());
+        message.setReplyContent(sendMsgDto.getMeta().getReply().getContent());
+        message.setReplyAuthor(sendMsgDto.getMeta().getReply().getAuthor());
+        message.setGroupId(sendMsgDto.getGroupId());
         return message;
     }
 }

@@ -4,31 +4,31 @@
 
     <!-- 通用查询映射结果 -->
     <resultMap id="BaseResultMap" type="com.linkhub.common.model.pojo.Message">
-        <id column="id" property="id" />
-        <result column="content" property="content" />
-        <result column="author" property="author" />
-        <result column="converse_id" property="converseId" />
-        <result column="has_recall" property="hasRecall" />
-        <result column="reply_id" property="replyId" />
-        <result column="reply_content" property="replyContent" />
-        <result column="reply_author" property="replyAuthor" />
-        <result column="group_id" property="groupId" />
-        <result column="createAt" property="createAt" />
-        <result column="updateAt" property="updateAt" />
+        <id column="id" property="id"/>
+        <result column="content" property="content"/>
+        <result column="author" property="author"/>
+        <result column="converse_id" property="converseId"/>
+        <result column="has_recall" property="hasRecall"/>
+        <result column="reply_id" property="replyId"/>
+        <result column="reply_content" property="replyContent"/>
+        <result column="reply_author" property="replyAuthor"/>
+        <result column="group_id" property="groupId"/>
+        <result column="createAt" property="createAt"/>
+        <result column="updateAt" property="updateAt"/>
     </resultMap>
 
     <resultMap id="MsgVoMap" type="com.linkhub.common.model.vo.MessageVo">
-        <id column="id" property="id" />
-        <result column="content" property="content" />
-        <result column="msgAuthor" property="author" />
-        <result column="converse_id" property="converseId" />
-        <result column="has_recall" property="hasRecall" />
-        <result column="reply_id" property="replyId" />
-        <result column="reply_content" property="replyContent" />
-        <result column="reply_author" property="replyAuthor" />
-        <result column="group_id" property="groupId" />
-        <result column="createAt" property="createAt" />
-        <result column="updateAt" property="updateAt" />
+        <id column="id" property="id"/>
+        <result column="content" property="content"/>
+        <result column="msgAuthor" property="author"/>
+        <result column="converse_id" property="converseId"/>
+        <result column="has_recall" property="hasRecall"/>
+        <result column="reply_id" property="replyId"/>
+        <result column="reply_content" property="replyContent"/>
+        <result column="reply_author" property="replyAuthor"/>
+        <result column="group_id" property="groupId"/>
+        <result column="createAt" property="createAt"/>
+        <result column="updateAt" property="updateAt"/>
         <collection property="reactions" ofType="com.linkhub.common.model.pojo.Reaction">
             <result column="name" property="name"/>
             <result column="reactionAuthor" property="author"/>
@@ -45,16 +45,29 @@
         id, content, author, converse_id, has_recall, reply_id, reply_content, reply_author, group_id, createAt, updateAt
     </sql>
 
-    <select id="findOneById" resultMap="MsgVoMap">
-        select m.id, content, m.author as msgAuthor, mr.author as reactionAuthor, converse_id, has_recall, reply_id, reply_content, reply_author, group_id,
-               mr.name, mr.mention
-        from message m left join msg_extra mr on m.id = mr.msg_id where m.id = #{id}
+    <select id="findMsgVoById" resultMap="MsgVoMap">
+        select m.id,
+               content,
+               m.author  as msgAuthor,
+               mr.author as reactionAuthor,
+               converse_id,
+               has_recall,
+               reply_id,
+               reply_content,
+               reply_author,
+               group_id,
+               mr.name,
+               mr.mention
+        from message m
+                 left join msg_extra mr on m.id = mr.msg_id
+        where m.id = #{id}
     </select>
 
     <select id="fetchConverseMessage" resultMap="MsgVoMap">
 
-        select m.id, content, m.author as msgAuthor, mr.author as reactionAuthor, converse_id, has_recall, reply_id, reply_content, reply_author, group_id,
-               mr.name, mr.mention
+        select m.id, content, m.author as msgAuthor, mr.author as reactionAuthor, converse_id, has_recall, reply_id,
+        reply_content, reply_author, group_id,
+        mr.name, mr.mention
         from message m left join msg_extra mr on m.id = mr.msg_id
         where m.converse_id = #{converseId}
         <if test="startId != null and startId != 0">
@@ -65,56 +78,63 @@
     </select>
 
     <select id="fetchNearbyMessage" resultMap="MsgVoMap">
-        SELECT * FROM (
-        SELECT
-        m.id,
-        content,
-        m.author AS msgAuthor,
-        mr.author AS reactionAuthor,
-        converse_id,
-        has_recall,
-        reply_id,
-        reply_content,
-        reply_author,
-        group_id,
-        mr.name,
-        mr.mention
-        FROM
-        message m
-        LEFT JOIN msg_extra mr ON m.id = mr.msg_id
-        WHERE
-        m.converse_id = #{converseId}
-        AND m.id &lt;= #{messageId}
-        ORDER BY
-        m.id DESC
-        LIMIT #{num}
-        ) AS before_result
+        SELECT *
+        FROM (SELECT m.id,
+                     content,
+                     m.author  AS msgAuthor,
+                     mr.author AS reactionAuthor,
+                     converse_id,
+                     has_recall,
+                     reply_id,
+                     reply_content,
+                     reply_author,
+                     group_id,
+                     mr.name,
+                     mr.mention
+              FROM message m
+                       LEFT JOIN msg_extra mr ON m.id = mr.msg_id
+              WHERE m.converse_id = #{converseId}
+                AND m.id &lt;= #{messageId}
+              ORDER BY m.id DESC
+              LIMIT #{num}) AS before_result
         UNION ALL
-        SELECT * FROM (
-        SELECT
-        m.id,
-        content,
-        m.author AS msgAuthor,
-        mr.author AS reactionAuthor,
-        converse_id,
-        has_recall,
-        reply_id,
-        reply_content,
-        reply_author,
-        group_id,
-        mr.name,
-        mr.mention
-        FROM
-        message m
-        LEFT JOIN msg_extra mr ON m.id = mr.msg_id
-        WHERE
-        m.converse_id = #{converseId}
-        AND m.id &gt; #{messageId}
-        ORDER BY
-        m.id DESC
-        LIMIT #{num}
-        ) AS before_result
+        SELECT *
+        FROM (SELECT m.id,
+                     content,
+                     m.author  AS msgAuthor,
+                     mr.author AS reactionAuthor,
+                     converse_id,
+                     has_recall,
+                     reply_id,
+                     reply_content,
+                     reply_author,
+                     group_id,
+                     mr.name,
+                     mr.mention
+              FROM message m
+                       LEFT JOIN msg_extra mr ON m.id = mr.msg_id
+              WHERE m.converse_id = #{converseId}
+                AND m.id &gt; #{messageId}
+              ORDER BY m.id DESC
+              LIMIT #{num}) AS before_result
         ORDER BY id
+    </select>
+
+    <select id="selectConverseLastMessages" resultMap="MsgVoMap">
+        select m.id, content, m.author as msgAuthor, mr.author as reactionAuthor, m.converse_id, has_recall, reply_id,
+        reply_content, reply_author, group_id,
+        mr.name, mr.mention
+        FROM message m
+        JOIN (
+        SELECT converse_id, MAX(id) AS last_message_id
+        FROM message
+        WHERE converse_id IN
+        <foreach collection="list" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+        GROUP BY converse_id
+        ) AS last_msg ON m.converse_id = last_msg.converse_id AND m.id = last_msg.last_message_id
+        LEFT JOIN msg_extra mr ON m.id = mr.msg_id;
     </select>
 
 

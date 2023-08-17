@@ -14,7 +14,9 @@ public enum ClientEventEnum {
     /**
     * 新增消息
     */
-    MESSAGE_ADD(0, "add");
+    MESSAGE_ADD(0, "add"),
+    MESSAGE_UPDATE(1, "update"),
+    MESSAGE_DELETE(2, "delete");
 
     private final Integer code;
 

@@ -92,17 +92,17 @@ public class IMUtil {
      * @date: 2023/8/14 上午11:26
      * @description:
      */
-    public static void notify(List<String> target, IMNotifyTypeEnum type, ClientEventEnum event, Object data) {
+    public static void notify(String[] target, IMNotifyTypeEnum type, ClientEventEnum event, Object data) {
         String eventName = event.getMessage();
 
         if (type == IMNotifyTypeEnum.UNICAST) {
-            server.getRoomOperations(buildUserRoomId(target.get(0))).sendEvent(eventName, data);
+            server.getRoomOperations(buildUserRoomId(target[0])).sendEvent(eventName, data);
         } else if (type == IMNotifyTypeEnum.LIST_CAST) {
-            target.forEach(userId -> {
+            Arrays.stream(target).forEach(userId -> {
                 server.getRoomOperations(buildUserRoomId(userId)).sendEvent(eventName, data);
             });
         } else if (type == IMNotifyTypeEnum.ROOM_CAST) {
-            server.getRoomOperations(target.get(0)).sendEvent(eventName, data);
+            server.getRoomOperations(target[0]).sendEvent(eventName, data);
         } else if (type == IMNotifyTypeEnum.BROAD_CAST) {
             server.getBroadcastOperations().sendEvent(eventName, data);
         } else {

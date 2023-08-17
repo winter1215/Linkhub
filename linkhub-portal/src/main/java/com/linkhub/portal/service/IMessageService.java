@@ -1,9 +1,7 @@
 package com.linkhub.portal.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.linkhub.common.model.dto.message.FetchConverseMessageDto;
-import com.linkhub.common.model.dto.message.FetchNearbyMessageDto;
-import com.linkhub.common.model.dto.message.SendMsgDto;
+import com.linkhub.common.model.dto.message.*;
 import com.linkhub.common.model.pojo.Message;
 import com.linkhub.common.model.vo.MessageVo;
 import com.linkhub.common.utils.R;
@@ -44,4 +42,20 @@ public interface IMessageService extends IService<Message> {
      * @description:
      */
     List<MessageVo> fetchNearbyMessage(FetchNearbyMessageDto fetchNearbyMessageDto);
+
+    /**
+    * 撤回消息
+    */
+    MessageVo recallMessage(Long messageId);
+
+    /**
+    * 删除消息 (群组管理员)
+    */
+    MessageVo deleteMessage(Long messageId);
+
+    List<String> fetchConverseLastMessages(List<String> converseIds);
+
+    boolean addReaction(ReactionDto reactionDto);
+
+    boolean removeReaction(ReactionDto reactionDto);
 }
