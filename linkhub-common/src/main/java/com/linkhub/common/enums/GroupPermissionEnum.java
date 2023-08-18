@@ -32,6 +32,9 @@ public enum GroupPermissionEnum {
     public static List<Integer> getValues(){
         return Arrays.stream(values()).map(GroupPermissionEnum::getCode).collect(Collectors.toList());
     }
+    public static List<String> getMessages(){
+        return Arrays.stream(values()).map(GroupPermissionEnum::getMessage).collect(Collectors.toList());
+    }
 
     public static GroupPermissionEnum getEnumByValue(Integer value) {
         if (ObjectUtils.isEmpty(value)) {

@@ -124,6 +124,7 @@ public class MessageServiceImpl extends ServiceImpl<MessageMapper, Message> impl
         syncMessageBuffer();
         MessageVo message = baseMapper.findMsgVoById(messageId);
         String converseId = message.getConverseId();
+        String groupId = message.getGroupId();
 
         if (ObjectUtils.isEmpty(message)) {
             throw new GlobalException(ErrorCode.NO_AUTH_ERROR);
@@ -139,7 +140,7 @@ public class MessageServiceImpl extends ServiceImpl<MessageMapper, Message> impl
         }
 
         // 是否为群消息,是否为管理员 || 是否为消息发送者
-        if (ObjectUtils.isNotEmpty(message.getGroupId()) && !groupService.checkUserIsOwner()) {
+        if (ObjectUtils.isNotEmpty(groupId) && !groupService.checkUserIsOwner(groupId, userId)) {
             if (!userId.equals(message.getAuthor())) {
                 throw new GlobalException(ErrorCode.NO_AUTH_ERROR);
             }

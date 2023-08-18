@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/converse")
 public class ConverseController {
 
-    @ApiOperation("创建DM会话")
-    @PostMapping("createDMConverse")
-    public R  createDMConverse
+    //@ApiOperation("创建DM会话")
+    //@PostMapping("createDMConverse")
+    //public R  createDMConverse
 }
