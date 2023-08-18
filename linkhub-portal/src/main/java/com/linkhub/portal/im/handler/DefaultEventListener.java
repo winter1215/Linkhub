@@ -1,12 +1,9 @@
 package com.linkhub.portal.im.handler;
 
+import cn.hutool.json.JSONUtil;
 import com.corundumstudio.socketio.AckRequest;
 import com.corundumstudio.socketio.SocketIOClient;
 import com.corundumstudio.socketio.annotation.OnEvent;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.linkhub.common.config.exception.GlobalException;
-import com.linkhub.common.enums.ErrorCode;
 import com.linkhub.common.model.vo.FriendVo;
 import com.linkhub.portal.im.util.IMUtil;
 import com.linkhub.portal.service.IConverseService;

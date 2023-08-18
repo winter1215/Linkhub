@@ -15,6 +15,7 @@ import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -36,6 +37,7 @@ public class FriendRequestServiceImpl extends ServiceImpl<FriendRequestMapper, F
     FriendMapper friendMapper;
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public FriendRequest addFriend(FriendRequest friendRequest) {
         // 判空
         if (ObjectUtils.isEmpty(friendRequest) || StringUtils.isEmpty(friendRequest.getFrom()) || StringUtils.isEmpty(friendRequest.getTo())) {
@@ -86,6 +88,7 @@ public class FriendRequestServiceImpl extends ServiceImpl<FriendRequestMapper, F
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public int accept(String userId, OptFriendRequest optFriendRequest) {
         // 判空
         if (StringUtils.isEmpty(userId)) {
@@ -124,6 +127,7 @@ public class FriendRequestServiceImpl extends ServiceImpl<FriendRequestMapper, F
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public int deny(String userId, OptFriendRequest optFriendRequest) {
         // 判空
         if (StringUtils.isEmpty(userId)) {
@@ -154,6 +158,7 @@ public class FriendRequestServiceImpl extends ServiceImpl<FriendRequestMapper, F
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public int cancel(String userId, OptFriendRequest optFriendRequest) {
         // 判空
         if (StringUtils.isEmpty(userId)) {

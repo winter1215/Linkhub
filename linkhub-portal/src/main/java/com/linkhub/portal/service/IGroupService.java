@@ -1,9 +1,11 @@
 package com.linkhub.portal.service;
 
 import com.linkhub.common.enums.GroupPermissionEnum;
+import com.linkhub.common.model.dto.group.GroupInviteRequest;
 import com.linkhub.common.model.pojo.Group;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.linkhub.common.model.pojo.GroupMember;
+import com.linkhub.common.model.vo.GroupVo;
 
 import java.util.List;
 
@@ -38,4 +40,6 @@ public interface IGroupService extends IService<Group> {
     * 检查用户在指定群组是否指定权限
     */
     boolean checkUserPermission(String userId, String groupId, GroupPermissionEnum deleteMessage);
+
+    GroupVo createGroupInvite(String userId, GroupInviteRequest groupInviteRequest);
 }

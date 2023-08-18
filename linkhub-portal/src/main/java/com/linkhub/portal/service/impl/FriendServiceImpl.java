@@ -15,6 +15,7 @@ import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,6 +35,7 @@ public class FriendServiceImpl extends ServiceImpl<FriendMapper, Friend> impleme
     FriendMapper friendMapper;
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public int removeFriend(User user, DeleteFriendRequest deleteFriendRequest) {
         // 判空
         if (ObjectUtils.isEmpty(user) || StringUtils.isEmpty(user.getId())) {
@@ -71,6 +73,7 @@ public class FriendServiceImpl extends ServiceImpl<FriendMapper, Friend> impleme
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public boolean setFriendNickname(String userId, SetFriendNicknameRequest setFriendNicknameRequest) {
         // 判空
         if (StringUtils.isEmpty(userId) || ObjectUtils.isEmpty(setFriendNicknameRequest)) {

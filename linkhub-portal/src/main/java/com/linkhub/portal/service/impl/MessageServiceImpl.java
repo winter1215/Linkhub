@@ -250,6 +250,15 @@ public class MessageServiceImpl extends ServiceImpl<MessageMapper, Message> impl
         return msgExtraService.remove(wrapper);
     }
 
+    /**
+     * 发送系统信息
+     * @param sendMsgDto
+     */
+    @Override
+    public void sendSysMessage(SendMsgDto sendMsgDto) {
+        sendMessage(sendMsgDto);
+    }
+
 
     /**
      * 异步处理发送消息的实例化

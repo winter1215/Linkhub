@@ -7,17 +7,15 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * @author winter
- * @create 2023-08-14 上午11:36
+ * @author linkcastling
+ * @create 2023-08-18 上午16:17
  */
-public enum ClientEventEnum {
+public enum GroupInviteEnum {
     /**
-    * 新增消息
-    */
-    MESSAGE_ADD(0, "notify:chat.message.add"),
-    MESSAGE_UPDATE(1, "notify:chat.message.update"),
-    MESSAGE_DELETE(2, "notify:chat.message.delete"),
-    CONVERSE_UPDATEDM(3, "notify:chat.converse.updateDMConverse");
+     * 新增消息
+     */
+    NORMAL_INVITE(0, "normal"),
+    PERMANENT_INVITE(1, "permanent");
     private final Integer code;
 
     /**
@@ -26,14 +24,14 @@ public enum ClientEventEnum {
     private final String message;
 
     public static List<Integer> getValues(){
-        return Arrays.stream(values()).map(ClientEventEnum::getCode).collect(Collectors.toList());
+        return Arrays.stream(values()).map(GroupInviteEnum::getCode).collect(Collectors.toList());
     }
 
-    public static ClientEventEnum getEnumByValue(Integer value) {
+    public static GroupInviteEnum getEnumByValue(Integer value) {
         if (ObjectUtils.isEmpty(value)) {
             return null;
         }
-        for (ClientEventEnum groupPermissionEnum : values()) {
+        for (GroupInviteEnum groupPermissionEnum : values()) {
             if (groupPermissionEnum.code.equals(value)) {
                 return groupPermissionEnum;
             }
@@ -41,7 +39,7 @@ public enum ClientEventEnum {
         return null;
     }
 
-    ClientEventEnum(Integer code, String message) {
+    GroupInviteEnum(Integer code, String message) {
         this.code = code;
         this.message = message;
     }

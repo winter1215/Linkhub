@@ -10,30 +10,28 @@ import java.util.stream.Collectors;
  * @author winter
  * @create 2023-08-14 上午11:36
  */
-public enum ClientEventEnum {
+public enum ConverseTypeEnum {
     /**
     * 新增消息
     */
-    MESSAGE_ADD(0, "notify:chat.message.add"),
-    MESSAGE_UPDATE(1, "notify:chat.message.update"),
-    MESSAGE_DELETE(2, "notify:chat.message.delete"),
-    CONVERSE_UPDATEDM(3, "notify:chat.converse.updateDMConverse");
-    private final Integer code;
+    CONVERSE_TYPE_DM(0, "DM"),
+    CONVERSE_TYPE_MULTI(1, "Multi");
 
+    private final Integer code;
     /**
      * 信息
      */
     private final String message;
 
     public static List<Integer> getValues(){
-        return Arrays.stream(values()).map(ClientEventEnum::getCode).collect(Collectors.toList());
+        return Arrays.stream(values()).map(ConverseTypeEnum::getCode).collect(Collectors.toList());
     }
 
-    public static ClientEventEnum getEnumByValue(Integer value) {
+    public static ConverseTypeEnum getEnumByValue(Integer value) {
         if (ObjectUtils.isEmpty(value)) {
             return null;
         }
-        for (ClientEventEnum groupPermissionEnum : values()) {
+        for (ConverseTypeEnum groupPermissionEnum : values()) {
             if (groupPermissionEnum.code.equals(value)) {
                 return groupPermissionEnum;
             }
@@ -41,7 +39,7 @@ public enum ClientEventEnum {
         return null;
     }
 
-    ClientEventEnum(Integer code, String message) {
+    ConverseTypeEnum(Integer code, String message) {
         this.code = code;
         this.message = message;
     }

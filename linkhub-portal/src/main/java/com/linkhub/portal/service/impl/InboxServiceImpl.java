@@ -32,7 +32,10 @@ public class InboxServiceImpl extends ServiceImpl<InboxMapper, Inbox> implements
     @Override
     @Async(LINKHUB_THREAD_POOL)
     public void insertMsgInbox(SendMsgDto sendMsgDto) {
-        List<String> mentions = sendMsgDto.getMeta().getMentions();
+        List<String> mentions = new ArrayList<>();
+        if (sendMsgDto.getMeta() != null) {
+            mentions = sendMsgDto.getMeta().getMentions();
+        }
         if (ObjectUtils.isEmpty(mentions)) {
             return;
         }
