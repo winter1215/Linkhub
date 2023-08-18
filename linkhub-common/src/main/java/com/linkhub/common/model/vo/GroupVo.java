@@ -1,35 +1,62 @@
 package com.linkhub.common.model.vo;
 
+import com.baomidou.mybatisplus.annotation.FieldFill;
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
+import com.linkhub.common.model.pojo.Group;
+import com.linkhub.common.model.pojo.GroupMember;
+import com.linkhub.common.model.pojo.GroupPanel;
+import com.linkhub.common.model.pojo.GroupRole;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 /**
- * @author LinkCastling
- * @date 2023/8/18 16:31
+ * @author winter
+ * @create 2023-08-18 上午1:04
  */
 @Data
 public class GroupVo {
+    @TableId(value = "id", type = IdType.ASSIGN_UUID)
+    private String id;
 
-    @ApiModelProperty("群组邀请的id")
-    private String _id;
+    private String name;
 
-    @ApiModelProperty("邀请链接的代码")
-    private String code;
+    @ApiModelProperty(value = "创建者")
+    private String owner;
 
-    @ApiModelProperty("群组的创建者")
-    private String creator;
+    @ApiModelProperty(value = "群组描述")
+    private String description;
 
-    @ApiModelProperty("过期时间，如果是永久的，则没有这个过期时间")
-    private LocalDateTime expiredAt;
+    @ApiModelProperty(value = "群组头像")
+    private String avatar;
 
-    @ApiModelProperty("使用量")
-    private Integer usage;
+    private List<GroupMember> members;
+    private List<GroupPanel> panels;
+    private List<GroupRole> roles;
+    @TableField(typeHandler = JacksonTypeHandler.class)
+    private Group.Config config;
 
-    @ApiModelProperty("创建时间")
-    private LocalDateTime createdAt;
+    @ApiModelProperty(value = "权限列表: Enum, Json")
+    @TableField(typeHandler = JacksonTypeHandler.class)
+    private List<String> fallbackPermission;
 
-    @ApiModelProperty("更新时间")
-    private LocalDateTime updatedAt;
+    @TableField(fill = FieldFill.INSERT)
+    private LocalDateTime createAt;
+
+    @TableField(fill = FieldFill.INSERT_UPDATE)
+    private LocalDateTime updateAt;
+
+    @Data
+    public static class Config {
+        @ApiModelProperty(value = "是否隐藏用户的随机码")
+        private Boolean hideMemberInfo;
+
+        @ApiModelProperty(value = "群组背景图片")
+        private String groupBackgroundImage;
+    }
 }

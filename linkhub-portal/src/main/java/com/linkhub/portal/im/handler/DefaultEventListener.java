@@ -5,9 +5,11 @@ import com.corundumstudio.socketio.AckRequest;
 import com.corundumstudio.socketio.SocketIOClient;
 import com.corundumstudio.socketio.annotation.OnEvent;
 import com.linkhub.common.model.vo.FriendVo;
+import com.linkhub.common.model.vo.GroupVo;
 import com.linkhub.portal.im.util.IMUtil;
 import com.linkhub.portal.service.IConverseService;
 import com.linkhub.portal.service.IFriendService;
+import com.linkhub.portal.service.IGroupService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -25,6 +27,8 @@ import java.util.Set;
 public class DefaultEventListener {
     @Resource
     private IConverseService converseService;
+    @Resource
+    private IGroupService groupService;
 
     @Resource
     private IFriendService friendService;
@@ -42,6 +46,13 @@ public class DefaultEventListener {
         String userId = IMUtil.getUserIdByClient(client);
         List<FriendVo> friendVoList = friendService.getAllFriendsById(userId);
         String json = JSONUtil.toJsonStr(friendVoList);
+        client.sendEvent(null, json);
+    }
+    @OnEvent("group.getUserGroups")
+    public void getUserGroups(SocketIOClient client, Object data, AckRequest ackSender) {
+        String userId = IMUtil.getUserIdByClient(client);
+        List<GroupVo> groups = groupService.getUserGroups(userId);
+        String json = JSONUtil.toJsonStr(groups);
         client.sendEvent(null, json);
     }
 

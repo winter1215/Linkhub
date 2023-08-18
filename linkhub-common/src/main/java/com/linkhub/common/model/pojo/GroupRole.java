@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.annotation.*;
 
 import java.time.LocalDateTime;
 import java.io.Serializable;
+import java.util.List;
 
 import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import io.swagger.annotations.ApiModel;
@@ -38,7 +39,7 @@ public class GroupRole implements Serializable {
 
     @ApiModelProperty(value = "该组拥有的权限列表")
     @TableField(typeHandler = JacksonTypeHandler.class)
-    private String permissions;
+    private List<String> permissions;
 
     @TableField(fill = FieldFill.INSERT)
     private LocalDateTime createAt;

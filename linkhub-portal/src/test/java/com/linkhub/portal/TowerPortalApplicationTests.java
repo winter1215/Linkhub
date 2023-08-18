@@ -18,7 +18,7 @@ class TowerPortalApplicationTests {
 
     @Test
     void contextLoads() {
-        groupService.checkUserIsOwner();
+        groupService.checkUserIsOwner("1", "1");
     }
 
 }
