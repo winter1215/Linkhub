@@ -175,6 +175,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
      * @param user user
      */
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public int updateUser(User user) {
         userCacheService.setUser(user);
         return userMapper.updateById(user);
@@ -244,6 +245,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
      * @return
      */
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public String createTemporaryUser(UserNameRequest userNameRequest) {
         // 判断nickname是否为空
         if (ObjectUtils.isEmpty(userNameRequest) || StringUtils.isBlank(userNameRequest.getNickname()) || StringUtils.isEmpty(userNameRequest.getNickname())) {
@@ -281,6 +283,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
      * @return
      */
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public String claimTemporaryUser(ClaimUserDto claimUserDto) {
         LambdaQueryWrapper<User> wrapper = new LambdaQueryWrapper();
         wrapper.eq(User::getId, claimUserDto.getUserId());
@@ -376,6 +379,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public UserSettingVo setUserSettings(String userId, UserSettingsRequest userSettingsRequest) {
         // 判空
         if (StringUtils.isEmpty(userId) || ObjectUtils.isEmpty(userSettingsRequest)) {

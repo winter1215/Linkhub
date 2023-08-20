@@ -3,6 +3,8 @@ package com.linkhub.common.mapper;
 import com.linkhub.common.model.pojo.Converse;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
+import java.util.List;
+
 /**
  * <p>
  * 会话表 Mapper 接口

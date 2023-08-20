@@ -44,6 +44,8 @@ public interface IGroupService extends IService<Group> {
     */
     boolean checkUserPermission(String userId, String groupId, GroupPermissionEnum deleteMessage, GroupVo groupVo);
 
+    GroupVo createGroupInvite(String userId, GroupInviteRequest groupInviteRequest);
+
     List<GroupVo> getUserGroups(String userId);
 
     Group getGroupBasicInfo(String groupId);

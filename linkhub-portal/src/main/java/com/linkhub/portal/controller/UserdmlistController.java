@@ -38,7 +38,7 @@ public class UserdmlistController {
     @PostMapping("/addConverse")
     public R addConverse(@RequestBody ConverseIdRequest converseIdRequest) {
         String userId = SecurityUtils.getLoginUserId();
-        UserdmlistDto userdmlistDto = userdmlistService.addConverse(userId, converseIdRequest);
+        UserdmlistDto userdmlistDto = userdmlistService.addConverse(userId, converseIdRequest.getConverseId());
         return R.ok()
                 .setData(userdmlistDto);
     }

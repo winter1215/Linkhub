@@ -41,7 +41,10 @@ public class MsgExtra implements Serializable {
 
 
     public static List<MsgExtra> convertToDomain(SendMsgDto sendMsgDto) {
-        List<String> mentions = sendMsgDto.getMeta().getMentions();
+        List<String> mentions = new ArrayList<>();
+        if (sendMsgDto.getMeta() != null) {
+            mentions = sendMsgDto.getMeta().getMentions();
+        }
         List<MsgExtra> res = new ArrayList<>();
         mentions.forEach(item -> {
             MsgExtra msgExtra = new MsgExtra();

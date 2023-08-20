@@ -58,4 +58,6 @@ public interface IMessageService extends IService<Message> {
     boolean addReaction(ReactionDto reactionDto);
 
     boolean removeReaction(ReactionDto reactionDto);
+
+    void sendSysMessage(SendMsgDto sendMsgDto);
 }

@@ -16,5 +16,5 @@ import com.baomidou.mybatisplus.extension.service.IService;
  */
 public interface IUserdmlistService extends IService<Userdmlist> {
 
-    UserdmlistDto addConverse(String userId, ConverseIdRequest converseIdRequest);
+    UserdmlistDto addConverse(String userId, String converseId);
 }

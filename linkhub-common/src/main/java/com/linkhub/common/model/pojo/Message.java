@@ -64,9 +64,15 @@ public class Message implements Serializable {
         message.setContent(sendMsgDto.getContent());
         message.setAuthor(author);
         message.setConverseId(sendMsgDto.getConverseId());
-        message.setReplyId(sendMsgDto.getMeta().getReply().get_id());
-        message.setReplyContent(sendMsgDto.getMeta().getReply().getContent());
-        message.setReplyAuthor(sendMsgDto.getMeta().getReply().getAuthor());
+        if (sendMsgDto.getMeta() != null && sendMsgDto.getMeta().getReply() != null) {
+            message.setReplyId(sendMsgDto.getMeta().getReply().get_id());
+        }
+        if (sendMsgDto.getMeta() != null && sendMsgDto.getMeta().getReply() != null) {
+            message.setReplyContent(sendMsgDto.getMeta().getReply().getContent());
+        }
+        if (sendMsgDto.getMeta() != null && sendMsgDto.getMeta().getReply() != null) {
+            message.setReplyAuthor(sendMsgDto.getMeta().getReply().getAuthor());
+        }
         message.setGroupId(sendMsgDto.getGroupId());
         return message;
     }

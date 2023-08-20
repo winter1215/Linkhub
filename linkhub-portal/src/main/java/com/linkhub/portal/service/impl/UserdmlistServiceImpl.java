@@ -14,6 +14,7 @@ import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,18 +34,16 @@ public class UserdmlistServiceImpl extends ServiceImpl<UserdmlistMapper, Userdml
     UserdmlistMapper userdmlistMapper;
 
     @Override
-    public UserdmlistDto addConverse(String userId, ConverseIdRequest converseIdRequest) {
+    @Transactional(rollbackFor = Exception.class)
+    public UserdmlistDto addConverse(String userId, String converseId) {
         // 先插入，再查所有userId对应的会话返回
-        if (ObjectUtils.isEmpty(converseIdRequest)) {
-            throw new GlobalException(ErrorCode.PARAMS_ERROR);
-        }
-        if (StringUtils.isEmpty(userId) || StringUtils.isEmpty(converseIdRequest.getConverseId())) {
+        if (StringUtils.isEmpty(userId) || StringUtils.isEmpty(converseId)) {
             throw new GlobalException(ErrorCode.PARAMS_ERROR);
         }
 
         Userdmlist userdmlist = new Userdmlist();
         userdmlist.setUserId(userId);
-        userdmlist.setConverseId(converseIdRequest.getConverseId());
+        userdmlist.setConverseId(converseId);
         baseMapper.insert(userdmlist);
         // 查询userId对应的所有记录
         LambdaQueryWrapper<Userdmlist> wrapper = new LambdaQueryWrapper<>();

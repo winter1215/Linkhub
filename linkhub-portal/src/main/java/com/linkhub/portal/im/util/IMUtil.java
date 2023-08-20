@@ -85,7 +85,7 @@ public class IMUtil {
      * 向客户端推送消息
      * @param target: 组播: 发送对象的会话 id; 单播,列播: userId; 广播: null; 除了列播,集合应该都只带一个元素
      * @param type: ImNotifyTypeEnum 枚举对象,选择扩散的类型
-     * @param eventName: 事件名称
+     * @param event: 事件名称
      * @param data: 数据
      * @return: void
      * @author: winter
