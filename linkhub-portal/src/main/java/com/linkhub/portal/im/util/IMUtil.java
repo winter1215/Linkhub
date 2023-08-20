@@ -49,9 +49,8 @@ public class IMUtil {
         return "linkhub-online:" + userId;
     }
 
-    public static void joinOrLeaveRoom(Set<String> roomIds, boolean isJoin) {
-        String loginUserId = SecurityUtils.getLoginUserId();
-        String userRoomId = buildUserRoomId(loginUserId);
+    public static void joinOrLeaveRoom(Set<String> roomIds, String userId, boolean isJoin) {
+        String userRoomId = buildUserRoomId(userId);
         Collection<SocketIOClient> clients = server.getRoomOperations(userRoomId).getClients();
         if (ObjectUtils.isEmpty(clients)) {
             log.error("can not fetch clients in room({}), check connection event?", userRoomId);
@@ -64,21 +63,22 @@ public class IMUtil {
             } else {
                 client.leaveRooms(roomIds);
             }
-            log.info("user({}) join rooms({}) successfully ", loginUserId, roomIds);
+            log.info("user({}) join rooms({}) successfully ", userId, roomIds);
         });
     }
 
     /**
      * 加入房间
      */
-    public static void joinRoom(Set<String> roomIds) {
-        joinOrLeaveRoom(roomIds, true);
+    public static void joinRoom(Set<String> roomIds, String userId) {
+        joinOrLeaveRoom(roomIds, userId,true);
     }
     /**
     * 离开群组
     */
-    public static void leaveRoom(Set<String> roomIds) {
-        joinOrLeaveRoom(roomIds, false);
+    public static void leaveRoom(Set<String> roomIds, String userId)
+    {
+        joinOrLeaveRoom(roomIds, userId, false);
     }
 
     /**

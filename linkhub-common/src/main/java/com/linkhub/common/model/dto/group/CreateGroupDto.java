@@ -1,5 +1,6 @@
 package com.linkhub.common.model.dto.group;
 
+import com.linkhub.common.model.pojo.GroupPanel;
 import lombok.Data;
 
 import java.util.List;
@@ -11,13 +12,5 @@ import java.util.List;
 @Data
 public class CreateGroupDto {
     private String name;
-    private List<Panel> panels;
-
-    @Data
-    public class Panel {
-        private Integer id;
-        private String name;
-        private String parentId;
-        private Integer type;
-    }
+    private List<GroupPanel> panels;
 }

@@ -1,17 +1,15 @@
 package com.linkhub.portal.controller;
 
 
-import com.linkhub.common.model.dto.group.CreateGroupDto;
-import com.linkhub.common.model.dto.group.UpdateGroupConfigDto;
-import com.linkhub.common.model.dto.group.UpdateGroupFieldDto;
+import com.linkhub.common.model.dto.group.*;
 import com.linkhub.common.model.pojo.Group;
 import com.linkhub.common.model.vo.GroupVo;
 import com.linkhub.common.utils.R;
 import com.linkhub.portal.service.IGroupService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import javax.validation.Valid;
 
 /**
  * <p>
@@ -49,6 +47,41 @@ public class GroupController {
         Group group = groupService.getGroupBasicInfo(groupId);
         return R.ok().setData(group);
     }
+
+    @PostMapping("quitGroup")
+    public R quitGroup(@RequestBody CommonGroupIdDto groupIdDto) {
+        groupService.quitGroup(groupIdDto.getGroupId());
+        return R.ok();
+    }
+
+    @PostMapping("appendGroupMemberRoles")
+    public R appendGroupMemberRoles(@RequestBody HandleMemberRolesDto appendMemberRolesDto) {
+        groupService.handleGroupMemberRoles(appendMemberRolesDto, true);
+        return R.ok();
+    }
+
+    @PostMapping("removeGroupMemberRoles")
+    public R removeGroupMemberRoles(@RequestBody HandleMemberRolesDto handleMemberRolesDto) {
+        groupService.handleGroupMemberRoles(handleMemberRolesDto, false);
+        return R.ok();
+    }
+
+    @PostMapping("createGroupPanel")
+    public R createGroupPanel(@Valid @RequestBody CreateGroupPanelDto createGroupPanelDto) {
+        return R.ok().setData(groupService.createGroupPanel(createGroupPanelDto));
+    }
+
+    @PostMapping("modifyGroupPanel")
+    public R modifyGroupPanel(@Valid @RequestBody ModGroupPanelDto modGroupPanelDto) {
+        return R.ok().setData(groupService.modifyGroupPanel(modGroupPanelDto));
+    }
+
+    @PostMapping("deleteGroupPanel")
+    public R deleteGroupPanel(@Valid @RequestBody DeleteGroupPanelDto deleteGroupPanelDto) {
+        return R.ok().setData(groupService.deleteGroupPanel(deleteGroupPanelDto));
+    }
+
+
 
 
 }

@@ -67,6 +67,7 @@ public class GroupRoleServiceImpl extends ServiceImpl<GroupRoleMapper, GroupRole
 
         // 查询分配给用户的权限列表
         List<GroupRole> groupRoles = this.listByIds(roles);
+        // flatMap 将二维的 list 扁平化
         List<String> userPermissions = groupRoles.stream()
                 .flatMap(groupRole -> groupRole.getPermissions().stream())
                 .collect(Collectors.toList());

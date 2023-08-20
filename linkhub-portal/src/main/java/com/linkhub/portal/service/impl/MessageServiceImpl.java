@@ -172,7 +172,7 @@ public class MessageServiceImpl extends ServiceImpl<MessageMapper, Message> impl
         if (ObjectUtils.isEmpty(groupId)) {
             throw new GlobalException(ErrorCode.NO_AUTH_ERROR, "无法删除私人消息");
         }
-        boolean hasPermission = groupService.checkUserPermission(userId, groupId, GroupPermissionEnum.DELETE_MESSAGE);
+        boolean hasPermission = groupService.checkUserPermission(userId, groupId, GroupPermissionEnum.DELETE_MESSAGE, null);
         if (!hasPermission) {
             throw new GlobalException(ErrorCode.NO_AUTH_ERROR, "群组权限不足");
         }

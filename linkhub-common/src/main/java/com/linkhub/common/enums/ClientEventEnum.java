@@ -16,7 +16,9 @@ public enum ClientEventEnum {
     */
     MESSAGE_ADD(0, "add"),
     MESSAGE_UPDATE(1, "update"),
-    MESSAGE_DELETE(2, "delete");
+    MESSAGE_DELETE(2, "delete"),
+    GROUP_REMOVE(3, "group.remove"),
+    GROUP_UPDATE_INFO(4, "group.updateInfo");
 
     private final Integer code;
 

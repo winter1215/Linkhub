@@ -15,9 +15,57 @@
         <result column="update_at" property="updateAt" />
     </resultMap>
 
+    <resultMap id="GroupVoResultMap" type="com.linkhub.common.model.vo.GroupVo">
+        <id column="id" property="id" />
+        <result column="name" property="name" />
+        <result column="owner" property="owner" />
+        <result column="description" property="description" />
+        <result column="avatar" property="avatar" />
+        <result column="config" property="config" typeHandler="com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler"/>
+        <result column="fallback_permission" property="fallbackPermission" typeHandler="com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler"/>
+        <result column="create_at" property="createAt" />
+        <result column="update_at" property="updateAt" />
+        <collection property="panels" ofType="com.linkhub.common.model.pojo.GroupPanel" >
+            <id column="gp_id" property="id"/>
+            <result column="gp_name" property="name"/>
+            <result column="id" property="groupId"/>
+            <result column="type" property="type" />
+            <result column="parent_id" property="parentId" />
+            <result column="meta" property="meta" typeHandler="com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler"/>
+            <result column="provider" property="provider" />
+            <result column="plugin_panel_name" property="pluginPanelName" />
+        </collection>
+        <collection property="members" ofType="com.linkhub.common.model.pojo.GroupMember">
+            <id column="gm_id" property="id" />
+            <result column="id" property="groupId" />
+            <result column="user_id" property="userId" />
+            <result column="roles" property="roles" typeHandler="com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler"/>
+            <result column="mute_util" property="muteUtil" />
+        </collection>
+        <collection property="roles" ofType="com.linkhub.common.model.pojo.GroupRole">
+            <id column="gr_id" property="id" />
+            <result column="id" property="groupId" />
+            <result column="gr_name" property="name" />
+            <result column="permissions" property="permissions" typeHandler="com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler" />
+        </collection>
+    </resultMap>
+
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
         id, name, owner, description, avatar, hide_member_info, group_background_image, fallback_permission, create_at, update_at
     </sql>
+
+    <select id="selectGroupVoById" resultMap="GroupVoResultMap">
+        select g.id, g.`name`, `owner`, `description`, `avatar`, config,
+               fallback_permission, g.create_at, g.update_at,
+               gp.id as gp_id, gp.name as gp_name, gp.meta, gp.parent_id, gp.plugin_panel_name, gp.type, gp.provider,
+               gr.id as gr_id, gr.name as gr_name, permissions,
+               gm.id as gm_id, user_id, roles, mute_util
+        from `group` g
+        left join group_panel gp on g.id = gp.group_id
+        left join group_role gr on g.id = gr.group_id
+        left join group_member gm on g.id = gm.group_id
+        where g.id = #{groupId}
+    </select>
 
 </mapper>
