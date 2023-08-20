@@ -1,34 +1,23 @@
 package com.linkhub.portal.service.impl;
 import java.util.List;
 
-import com.linkhub.common.enums.GroupPanelTypeREnum;
-import com.linkhub.common.model.dto.group.CreateGroupDto.Panel;
-
+import cn.hutool.json.JSONUtil;
+import com.linkhub.common.enums.*;
+import com.linkhub.common.model.dto.group.*;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
-import com.google.errorprone.annotations.Var;
 import com.linkhub.common.config.exception.GlobalException;
-import com.linkhub.common.enums.ErrorCode;
-import com.linkhub.common.enums.GroupPermissionEnum;
 import com.linkhub.common.mapper.GroupMemberMapper;
-import com.linkhub.common.model.dto.group.GroupInviteRequest;
 import com.linkhub.common.mapper.GroupPanelMapper;
-import com.linkhub.common.model.dto.group.CreateGroupDto;
-import com.linkhub.common.model.dto.group.UpdateGroupConfigDto;
-import com.linkhub.common.model.dto.group.UpdateGroupFieldDto;
 import com.linkhub.common.model.pojo.Group;
 import com.linkhub.common.mapper.GroupMapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.linkhub.common.model.pojo.GroupMember;
 import com.linkhub.common.model.vo.GroupVo;
-import com.linkhub.portal.security.LinkhubUserDetails;
 import com.linkhub.common.model.pojo.GroupPanel;
 import com.linkhub.common.model.pojo.GroupRole;
-import com.linkhub.common.model.vo.GroupVo;
 import com.linkhub.portal.im.util.IMUtil;
 import com.linkhub.portal.security.SecurityUtils;
-import com.linkhub.portal.service.IGroupMemberService;
-import com.linkhub.portal.service.IGroupPanelService;
 import com.linkhub.portal.service.IGroupMemberService;
 import com.linkhub.portal.service.IGroupPanelService;
 import com.linkhub.portal.service.IGroupRoleService;
