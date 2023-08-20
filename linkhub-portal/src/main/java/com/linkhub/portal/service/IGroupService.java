@@ -1,13 +1,11 @@
 package com.linkhub.portal.service;
 
 import com.linkhub.common.enums.GroupPermissionEnum;
-import com.linkhub.common.model.dto.group.GroupInviteRequest;
-import com.linkhub.common.model.dto.group.CreateGroupDto;
-import com.linkhub.common.model.dto.group.UpdateGroupConfigDto;
-import com.linkhub.common.model.dto.group.UpdateGroupFieldDto;
+import com.linkhub.common.model.dto.group.*;
 import com.linkhub.common.model.pojo.Group;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.linkhub.common.model.pojo.GroupMember;
+import com.linkhub.common.model.vo.GroupInviteVo;
 import com.linkhub.common.model.vo.GroupVo;
 
 import java.util.List;
@@ -47,7 +45,7 @@ public interface IGroupService extends IService<Group> {
     */
     boolean checkUserPermission(String userId, String groupId, GroupPermissionEnum deleteMessage);
 
-    GroupVo createGroupInvite(String userId, GroupInviteRequest groupInviteRequest);
+    GroupInviteVo createGroupInvite(String userId, GroupInviteRequest groupInviteRequest);
 
     List<GroupVo> getUserGroups(String userId);
 
@@ -59,4 +57,12 @@ public interface IGroupService extends IService<Group> {
     void updateGroupConfig(UpdateGroupConfigDto updateGroupConfigDto);
 
     GroupVo createGroup(CreateGroupDto createGroupDto);
+
+    int editGroupInvite(String userId, GroupEditRequest groupEditRequest);
+
+    GroupInviteVo getAllGroupInviteCode(String userId, String groupId);
+
+    GroupInviteVo findGroupInviteByCode(String code);
+
+    void applyInvite(GroupInviteApplyRequest groupInviteApplyRequest);
 }
