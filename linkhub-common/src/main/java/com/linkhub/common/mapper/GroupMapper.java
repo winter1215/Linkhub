@@ -2,6 +2,7 @@ package com.linkhub.common.mapper;
 
 import com.linkhub.common.model.pojo.Group;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.linkhub.common.model.vo.GroupVo;
 
 import java.util.List;
 
@@ -14,4 +15,9 @@ import java.util.List;
  * @since 2023-08-12
  */
 public interface GroupMapper extends BaseMapper<Group> {
+
+    /**
+    * 查询完整的 Group 信息(member, roles, panels, basicInfo)
+    */
+    GroupVo selectGroupVoById(String groupId);
 }

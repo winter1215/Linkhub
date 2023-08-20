@@ -11,14 +11,14 @@
         <result column="parent_id" property="parentId" />
         <result column="meta" property="meta" typeHandler="com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler"/>
         <result column="provider" property="provider" />
-        <result column="pluginPaneName" property="pluginPanelName" />
-        <result column="creat_at" property="creatAt" />
+        <result column="plugin_panel_name" property="pluginPanelName" />
+        <result column="creat_at" property="createAt" />
         <result column="update_at" property="updateAt" />
     </resultMap>
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        id, group_id, name, type, parent_id, meta, provider, pluginPaneName, creat_at, update_at
+        id, group_id, name, type, parent_id, meta, provider, plugin_panel_name, creat_at, update_at
     </sql>
 
 </mapper>

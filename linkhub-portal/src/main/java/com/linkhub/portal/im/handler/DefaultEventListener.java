@@ -38,7 +38,7 @@ public class DefaultEventListener {
         log.info("event listener");
         String userId = IMUtil.getUserIdByClient(client);
         Set<String> converseIds = converseService.getUserAllConverseIds(userId);
-        IMUtil.joinRoom(converseIds);
+        IMUtil.joinRoom(converseIds, userId);
     }
 
     @OnEvent("friend.getAllFriends")

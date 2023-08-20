@@ -41,9 +41,9 @@ public interface IGroupService extends IService<Group> {
     boolean checkUserIsOwner(String groupId, String userId);
 
     /**
-    * 检查用户在指定群组是否指定权限
+    * 检查用户在指定群组是否指定权限(如果传入 groupVo, 则不查数据库, 否则传入 null)
     */
-    boolean checkUserPermission(String userId, String groupId, GroupPermissionEnum deleteMessage);
+    boolean checkUserPermission(String userId, String groupId, GroupPermissionEnum deleteMessage, GroupVo groupVo);
 
     GroupInviteVo createGroupInvite(String userId, GroupInviteRequest groupInviteRequest);
 
@@ -65,4 +65,14 @@ public interface IGroupService extends IService<Group> {
     GroupInviteVo findGroupInviteByCode(String code);
 
     void applyInvite(GroupInviteApplyRequest groupInviteApplyRequest);
+
+    void quitGroup(String groupId);
+
+    void handleGroupMemberRoles(HandleMemberRolesDto appendMemberRolesDto, boolean isAppend);
+
+    boolean createGroupPanel(CreateGroupPanelDto createGroupPanelDto);
+
+    boolean modifyGroupPanel(ModGroupPanelDto modGroupPanelDto);
+
+    boolean deleteGroupPanel(DeleteGroupPanelDto deleteGroupPanelDto);
 }

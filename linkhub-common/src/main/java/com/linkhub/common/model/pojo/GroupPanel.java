@@ -44,17 +44,21 @@ public class GroupPanel implements Serializable {
 
     @ApiModelProperty(value = "面板的配置信息")
     @TableField(typeHandler = JacksonTypeHandler.class)
-    private String meta;
+    private Meta meta;
 
     private String provider;
 
-    @TableField("pluginPaneName")
     private String pluginPanelName;
 
-    private LocalDateTime creatAt;
+    @TableField(fill = FieldFill.INSERT)
+    private LocalDateTime createAt;
 
     @TableField(fill = FieldFill.INSERT_UPDATE)
     private LocalDateTime updateAt;
 
 
+    @Data
+    public static class Meta {
+        private String url;
+    }
 }
