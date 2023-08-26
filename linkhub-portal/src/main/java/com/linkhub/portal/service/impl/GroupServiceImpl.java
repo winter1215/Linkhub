@@ -1,7 +1,11 @@
 package com.linkhub.portal.service.impl;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
+import java.time.temporal.TemporalUnit;
 import java.util.List;
 
 import cn.hutool.json.JSONUtil;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.linkhub.common.enums.*;
 import com.linkhub.common.model.dto.group.*;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -326,18 +330,9 @@ public class GroupServiceImpl extends ServiceImpl<GroupMapper, Group> implements
                     .eq(GroupMember::getGroupId, groupId)
                     .eq(GroupMember::getUserId, userId));
             groupVo.getMembers().removeIf(item -> item.getUserId().equals(userId));
-            // 用户离开群组相关的房间 (groupId, panels)
-            Set<String> roomIds = groupVo.getPanels()
-                    .stream()
-                    .map(GroupPanel::getId).collect(Collectors.toSet());
-            roomIds.add(groupId);
-            IMUtil.leaveRoom(roomIds, userId);
-            // 单播给用户, remove 掉群组
-            String json = JSONUtil.createObj().set("groupId", groupId).toString();
-            IMUtil.notify(new String[]{userId}, IMNotifyTypeEnum.UNICAST, ClientEventEnum.GROUP_REMOVE, json);
-            // 通知群组内用户更新群组信息
-            String groupVoJson = JSONUtil.toJsonStr(groupVo);
-            IMUtil.notify(new String[]{groupId}, IMNotifyTypeEnum.ROOM_CAST, ClientEventEnum.GROUP_UPDATE_INFO, groupVoJson);
+
+            // 用户离开房间要做的通知
+            memberLeaveRoom(groupVo, userId);
         }
     }
 
@@ -425,7 +420,7 @@ public class GroupServiceImpl extends ServiceImpl<GroupMapper, Group> implements
     }
 
     @Override
-    public boolean modifyGroupPanel(ModGroupPanelDto groupPanelDto) {
+    public GroupVo modifyGroupPanel(ModGroupPanelDto groupPanelDto) {
         String userId = SecurityUtils.getLoginUserId();
         String groupId = groupPanelDto.getGroupId();
         String panelId = groupPanelDto.getPanelId();
@@ -450,16 +445,16 @@ public class GroupServiceImpl extends ServiceImpl<GroupMapper, Group> implements
         // todo: 这里 vo 的 panel 修改了吗
         boolean flag = groupPanelService.updateById(panel);
         if (!flag) {
-            return false;
+            return null;
         }
         // 发送更新通知
         String json = JSONUtil.toJsonStr(groupVo);
         IMUtil.notify(new String[]{ groupId }, IMNotifyTypeEnum.ROOM_CAST, ClientEventEnum.GROUP_UPDATE_INFO, json);
-        return true;
+        return groupVo;
     }
 
     @Override
-    public boolean deleteGroupPanel(DeleteGroupPanelDto deleteGroupPanelDto) {
+    public GroupVo deleteGroupPanel(DeleteGroupPanelDto deleteGroupPanelDto) {
         String groupId = deleteGroupPanelDto.getGroupId();
         String panelId = deleteGroupPanelDto.getPanelId();
         String userId = SecurityUtils.getLoginUserId();
@@ -482,7 +477,235 @@ public class GroupServiceImpl extends ServiceImpl<GroupMapper, Group> implements
             throw new GlobalException(ErrorCode.NO_AUTH_ERROR, "找不到该面板");
         }
 
-        return groupPanelService.removeById(panelId);
+        boolean remove = groupPanelService.removeById(panelId);
+        if (!remove) {
+            return null;
+        }
+        groupVo.getRoles().removeIf(item -> panelId.equals(item.getId()));
+        // 发送更新通知
+        String json = JSONUtil.toJsonStr(groupVo);
+        IMUtil.notify(new String[]{ groupId }, IMNotifyTypeEnum.ROOM_CAST, ClientEventEnum.GROUP_UPDATE_INFO, json);
+        return groupVo;
     }
+
+    @Override
+    public String getGroupLobbyConverseId(String groupId) {
+        Group group = baseMapper.selectById(groupId);
+        if (ObjectUtils.isEmpty(group)) {
+            throw new GlobalException(ErrorCode.OPERATION_ERROR);
+        }
+        // 获取 text 类型的 panels
+        LambdaQueryWrapper<GroupPanel> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(GroupPanel::getGroupId, groupId);
+        wrapper.eq(GroupPanel::getType, GroupPanelTypeREnum.TEXT.getCode());
+        List<GroupPanel> panels = groupPanelService.list(wrapper);
+        if (ObjectUtils.isEmpty(panels)) {
+            return null;
+        }
+        GroupPanel panel = panels.get(0);
+        return panel.getId();
+    }
+
+    @Override
+    public GroupVo createGroupRole(CreateGroupRoleDto createGroupRoleDto) {
+        String groupId = createGroupRoleDto.getGroupId();
+        String name = createGroupRoleDto.getName();
+        List<String> permissions = createGroupRoleDto.getPermissions();
+        String userId = SecurityUtils.getLoginUserId();
+        // 校验权限
+        GroupVo groupVo = baseMapper.selectGroupVoById(groupId);
+        if (ObjectUtils.isEmpty(groupVo)) {
+            throw new GlobalException(ErrorCode.PARAMS_ERROR);
+        }
+        boolean match = checkUserPermission(userId, groupId, GroupPermissionEnum.MANAGE_ROLES, groupVo);
+        if (!match) {
+            throw new GlobalException(ErrorCode.NO_AUTH_ERROR);
+        }
+
+        GroupRole groupRole = new GroupRole();
+        groupRole.setName(name);
+        groupRole.setPermissions(permissions);
+        boolean save = groupRoleService.save(groupRole);
+        if (!save) {
+            return null;
+        }
+
+        groupVo.getRoles().add(groupRole);
+        // 发送更新通知
+        String json = JSONUtil.toJsonStr(groupVo);
+        IMUtil.notify(new String[]{ groupId }, IMNotifyTypeEnum.ROOM_CAST, ClientEventEnum.GROUP_UPDATE_INFO, json);
+        return groupVo;
+    }
+
+    @Override
+    public GroupVo deleteGroupRole(DeleteGroupRoleDto deleteGroupRoleDto) {
+        String groupId = deleteGroupRoleDto.getGroupId();
+        String roleId = deleteGroupRoleDto.getRoleId();
+        String userId = SecurityUtils.getLoginUserId();
+        // 校验权限
+        GroupVo groupVo = baseMapper.selectGroupVoById(groupId);
+        if (ObjectUtils.isEmpty(groupVo)) {
+            throw new GlobalException(ErrorCode.PARAMS_ERROR);
+        }
+        boolean match = checkUserPermission(userId, groupId, GroupPermissionEnum.MANAGE_ROLES, groupVo);
+        if (!match) {
+            throw new GlobalException(ErrorCode.NO_AUTH_ERROR);
+        }
+        GroupRole groupRole = groupVo.getRoles().stream()
+                .filter(item -> roleId.equals(item.getId()))
+                .findFirst()
+                .orElse(null);
+
+        if (ObjectUtils.isEmpty(groupRole)) {
+            throw new GlobalException(ErrorCode.OPERATION_ERROR, "该权限组不存在");
+        }
+        boolean remove = groupRoleService.removeById(roleId);
+        if (!remove) {
+            return null;
+        }
+
+        // 发送更新通知
+        groupVo.getRoles().removeIf(item -> roleId.equals(item.getId()));
+        String json = JSONUtil.toJsonStr(groupVo);
+        IMUtil.notify(new String[]{ groupId }, IMNotifyTypeEnum.ROOM_CAST, ClientEventEnum.GROUP_UPDATE_INFO, json);
+        return groupVo;
+    }
+
+    @Override
+    public GroupVo updateGroupRoleName(UpdateGroupRoleDto updateGroupRoleDto) {
+        String groupId = updateGroupRoleDto.getGroupId();
+        String roleId = updateGroupRoleDto.getRoleId();
+        String name = updateGroupRoleDto.getName();
+        List<String> permissions = updateGroupRoleDto.getPermissions();
+        String userId = SecurityUtils.getLoginUserId();
+
+        // 校验权限
+        GroupVo groupVo = baseMapper.selectGroupVoById(groupId);
+        if (ObjectUtils.isEmpty(groupVo)) {
+            throw new GlobalException(ErrorCode.PARAMS_ERROR);
+        }
+        boolean match = checkUserPermission(userId, groupId, GroupPermissionEnum.MANAGE_ROLES, groupVo);
+        if (!match) {
+            throw new GlobalException(ErrorCode.NO_AUTH_ERROR);
+        }
+
+        GroupRole groupRole = groupVo.getRoles().stream()
+                .filter(item -> roleId.equals(item.getId()))
+                .findFirst()
+                .orElse(null);
+
+        if (ObjectUtils.isEmpty(groupRole)) {
+            throw new GlobalException(ErrorCode.OPERATION_ERROR, "该权限组不存在");
+        }
+        if (name != null) {
+            groupRole.setName(name);
+        }
+        if (permissions != null) {
+            groupRole.setPermissions(permissions);
+        }
+        boolean update = groupRoleService.updateById(groupRole);
+        String json = JSONUtil.toJsonStr(groupVo);
+        IMUtil.notify(new String[]{ groupId }, IMNotifyTypeEnum.ROOM_CAST, ClientEventEnum.GROUP_UPDATE_INFO, json);
+        return groupVo;
+    }
+
+    @Override
+    public GroupVo muteGroupMember(MuteGroupMemberDto muteGroupMemberDto) {
+        String groupId = muteGroupMemberDto.getGroupId();
+        String memberId = muteGroupMemberDto.getMemberId();
+        Integer muteMs = muteGroupMemberDto.getMuteMs();
+        // 负数代表接触禁言
+        boolean isMute = muteMs > 0;
+        String userId = SecurityUtils.getLoginUserId();
+
+        // 校验权限
+        GroupVo groupVo = baseMapper.selectGroupVoById(groupId);
+        if (ObjectUtils.isEmpty(groupVo)) {
+            throw new GlobalException(ErrorCode.PARAMS_ERROR);
+        }
+        boolean match = checkUserPermission(userId, groupId, GroupPermissionEnum.MANAGE_USER, groupVo);
+        if (!match) {
+            throw new GlobalException(ErrorCode.NO_AUTH_ERROR);
+        }
+        GroupMember member = groupVo.getMembers().stream()
+                .filter(item -> userId.equals(item.getUserId()))
+                .findFirst()
+                .orElseThrow(() -> new GlobalException(ErrorCode.OPERATION_ERROR, "成员未中找到"));
+
+        LocalDateTime muteUtil = isMute ? LocalDateTime.now().plus(muteMs, ChronoUnit.MILLIS) : null;
+        member.setMuteUtil(muteUtil);
+
+        boolean update = groupMemberService.update(new LambdaUpdateWrapper<GroupMember>()
+                .eq(GroupMember::getUserId, userId)
+                .set(GroupMember::getMuteUtil, muteUtil));
+        if (!update) {
+            throw new GlobalException(ErrorCode.OPERATION_ERROR);
+        }
+        String json = JSONUtil.toJsonStr(groupVo);
+        IMUtil.notify(new String[]{ groupId }, IMNotifyTypeEnum.ROOM_CAST, ClientEventEnum.GROUP_UPDATE_INFO, json);
+
+        // todo: 发送系统消息(禁言或者解禁)
+        return groupVo;
+    }
+
+    @Override
+    public GroupVo deleteGroupMember(DeleteGroupMemberDto deleteGroupMemberDto) {
+        String groupId = deleteGroupMemberDto.getGroupId();
+        String memberId = deleteGroupMemberDto.getMemberId();
+        String userId = SecurityUtils.getLoginUserId();
+
+        // 校验权限
+        GroupVo groupVo = baseMapper.selectGroupVoById(groupId);
+        if (ObjectUtils.isEmpty(groupVo)) {
+            throw new GlobalException(ErrorCode.PARAMS_ERROR);
+        }
+        boolean match = checkUserPermission(userId, groupId, GroupPermissionEnum.MANAGE_USER, groupVo);
+        if (!match) {
+            throw new GlobalException(ErrorCode.NO_AUTH_ERROR);
+        }
+        GroupMember member = groupVo.getMembers().stream()
+                .filter(item -> userId.equals(item.getUserId()))
+                .findFirst()
+                .orElseThrow(() -> new GlobalException(ErrorCode.OPERATION_ERROR, "成员未中找到"));
+        // 校验是否踢出核心成员或自己
+        if (userId.equals(memberId)) {
+            throw new GlobalException(ErrorCode.OPERATION_ERROR, "不允许踢出自己");
+        }
+        if (memberId.equals(groupVo.getOwner())) {
+            throw new GlobalException(ErrorCode.OPERATION_ERROR, "不允许提出 OP");
+        }
+        // 删除 DB
+        boolean remove = groupMemberService.remove(new LambdaQueryWrapper<GroupMember>()
+                .eq(GroupMember::getUserId, memberId)
+                .eq(GroupMember::getGroupId, groupId));
+
+        if (!remove) {
+            throw new GlobalException(ErrorCode.OPERATION_ERROR);
+        }
+        groupVo.getMembers().removeIf(item -> memberId.equals(item.getUserId()));
+        // 用户离开房间要做的通知
+        memberLeaveRoom(groupVo, memberId);
+        return groupVo;
+    }
+
+    /**
+    * 用户离开房间要做的通知
+    */
+    private void memberLeaveRoom(GroupVo groupVo, String memberId) {
+        String groupId = groupVo.getId();
+        Set<String> roomIds = groupVo.getPanels()
+                .stream()
+                .map(GroupPanel::getId).collect(Collectors.toSet());
+        roomIds.add(groupId);
+        IMUtil.leaveRoom(roomIds, memberId);
+        // 单播给用户, remove 掉群组
+        String json = JSONUtil.createObj().set("groupId", groupId).toString();
+        IMUtil.notify(new String[]{memberId}, IMNotifyTypeEnum.UNICAST, ClientEventEnum.GROUP_REMOVE, json);
+        // 通知群组内用户更新群组信息
+        String groupVoJson = JSONUtil.toJsonStr(groupVo);
+        IMUtil.notify(new String[]{groupId}, IMNotifyTypeEnum.ROOM_CAST, ClientEventEnum.GROUP_UPDATE_INFO, groupVoJson);
+
+    }
+
 
 }

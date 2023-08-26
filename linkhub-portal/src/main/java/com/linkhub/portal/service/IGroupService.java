@@ -63,7 +63,21 @@ public interface IGroupService extends IService<Group> {
 
     boolean createGroupPanel(CreateGroupPanelDto createGroupPanelDto);
 
-    boolean modifyGroupPanel(ModGroupPanelDto modGroupPanelDto);
+    GroupVo modifyGroupPanel(ModGroupPanelDto modGroupPanelDto);
 
-    boolean deleteGroupPanel(DeleteGroupPanelDto deleteGroupPanelDto);
+    GroupVo deleteGroupPanel(DeleteGroupPanelDto deleteGroupPanelDto);
+    /**
+    * 获取群组大厅 id
+    */
+    String getGroupLobbyConverseId(String groupId);
+
+    GroupVo createGroupRole(CreateGroupRoleDto createGroupRoleDto);
+
+    GroupVo deleteGroupRole(DeleteGroupRoleDto deleteGroupRoleDto);
+
+    GroupVo updateGroupRoleName(UpdateGroupRoleDto updateGroupRoleDto);
+
+    GroupVo muteGroupMember(MuteGroupMemberDto muteGroupMemberDto);
+
+    GroupVo deleteGroupMember(DeleteGroupMemberDto deleteGroupMemberDto);
 }

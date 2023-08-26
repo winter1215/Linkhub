@@ -91,15 +91,35 @@ public class GroupController {
         return R.ok().setData(groupService.deleteGroupPanel(deleteGroupPanelDto));
     }
 
-
-
-
-
-    @ApiOperation("创建群组邀请")
-    @PostMapping("/invite/createGroupInvite")
-    public R createGroupInvite(@RequestBody GroupInviteRequest groupInviteRequest) {
-        String userId = SecurityUtils.getLoginUserId();
-        GroupVo groupVo = groupService.createGroupInvite(userId, groupInviteRequest);
+    @PostMapping("createGroupRole")
+    public R createGroupRole(@Valid @RequestBody CreateGroupRoleDto createGroupRoleDto) {
+        return R.ok().setData(groupService.createGroupRole(createGroupRoleDto));
     }
+    @PostMapping("deleteGroupRole")
+    public R deleteGroupRole(@Valid @RequestBody DeleteGroupRoleDto deleteGroupRoleDto) {
+        return R.ok().setData(groupService.deleteGroupRole(deleteGroupRoleDto));
+    }
+
+    @PostMapping("updateGroupRoleName")
+    public R updateGroupRoleName(@Valid @RequestBody UpdateGroupRoleDto updateGroupRoleDto) {
+        return R.ok().setData(groupService.updateGroupRoleName(updateGroupRoleDto));
+    }
+
+    @PostMapping("updateGroupRolePermission")
+    public R updateGroupRolePermission(@Valid @RequestBody UpdateGroupRoleDto updateGroupRoleDto) {
+        return R.ok().setData(groupService.updateGroupRoleName(updateGroupRoleDto));
+    }
+
+    @PostMapping("muteGroupMember")
+    public R muteGroupMember(@Valid @RequestBody MuteGroupMemberDto muteGroupMemberDto) {
+        return R.ok().setData(groupService.muteGroupMember(muteGroupMemberDto));
+    }
+
+    @PostMapping("deleteGroupMember")
+    public R deleteGroupMember(@Valid @RequestBody DeleteGroupMemberDto deleteGroupMemberDto) {
+        return R.ok().setData(groupService.deleteGroupMember(deleteGroupMemberDto));
+    }
+
+
 
 }
