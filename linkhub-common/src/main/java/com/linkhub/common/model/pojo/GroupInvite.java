@@ -35,11 +35,14 @@ public class GroupInvite implements Serializable {
 
     private String groupId;
 
-    @TableField("expireAt")
-    private LocalDateTime expireat;
+    private LocalDateTime expireAt;
 
-    @ApiModelProperty(value = "使用次数")
+    @ApiModelProperty(value = "当前使用次数")
+    @TableField("`usage`")
     private Integer usage;
+
+    @ApiModelProperty(value = "最多使用次数")
+    private Integer usageLimit;
 
     @TableField(fill = FieldFill.INSERT)
     private LocalDateTime createAt;

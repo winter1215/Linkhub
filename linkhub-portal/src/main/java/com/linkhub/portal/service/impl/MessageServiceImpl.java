@@ -61,12 +61,17 @@ public class MessageServiceImpl extends ServiceImpl<MessageMapper, Message> impl
     @Resource
     private IInboxService iInboxService;
 
+
+
     @Override
     public void sendMessage(SendMsgDto sendMsgDto) {
+        sendMessage(sendMsgDto, SecurityUtils.getLoginUserId());
+    }
+
+    public void sendMessage(SendMsgDto sendMsgDto, String author) {
         // 是否群消息
         String groupId = sendMsgDto.getGroupId();
         String converseId = sendMsgDto.getConverseId();
-        String author = SecurityUtils.getLoginUserId();
 
         if (StringUtils.isNotEmpty(groupId)) {
             // todo: 待优化,缓存
@@ -258,6 +263,20 @@ public class MessageServiceImpl extends ServiceImpl<MessageMapper, Message> impl
     @Override
     public void sendSysMessage(SendMsgDto sendMsgDto) {
         sendMessage(sendMsgDto);
+    }
+
+    @Override
+    public void addGroupSystemMessage(String groupId, String message) {
+        String lobbyConverseId = groupService.getGroupLobbyConverseId(groupId);
+
+        if (StringUtils.isEmpty(lobbyConverseId)) { // 如果没有文本频道则跳过
+            return ;
+        }
+        SendMsgDto sendMsgDto = new SendMsgDto();
+        sendMsgDto.setContent(message);
+        sendMsgDto.setConverseId(lobbyConverseId);
+        sendMsgDto.setGroupId(groupId);
+        sendMessage(sendMsgDto, CommonConstants.SYSTEM_USERID);
     }
 
 

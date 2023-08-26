@@ -5,7 +5,6 @@ import com.linkhub.common.model.dto.group.*;
 import com.linkhub.common.model.pojo.Group;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.linkhub.common.model.pojo.GroupMember;
-import com.linkhub.common.model.vo.GroupInviteVo;
 import com.linkhub.common.model.vo.GroupVo;
 
 import java.util.List;
@@ -45,8 +44,6 @@ public interface IGroupService extends IService<Group> {
     */
     boolean checkUserPermission(String userId, String groupId, GroupPermissionEnum deleteMessage, GroupVo groupVo);
 
-    GroupInviteVo createGroupInvite(String userId, GroupInviteRequest groupInviteRequest);
-
     List<GroupVo> getUserGroups(String userId);
 
     Group getGroupBasicInfo(String groupId);
@@ -57,14 +54,6 @@ public interface IGroupService extends IService<Group> {
     void updateGroupConfig(UpdateGroupConfigDto updateGroupConfigDto);
 
     GroupVo createGroup(CreateGroupDto createGroupDto);
-
-    int editGroupInvite(String userId, GroupEditRequest groupEditRequest);
-
-    GroupInviteVo getAllGroupInviteCode(String userId, String groupId);
-
-    GroupInviteVo findGroupInviteByCode(String code);
-
-    void applyInvite(GroupInviteApplyRequest groupInviteApplyRequest);
 
     void quitGroup(String groupId);
 

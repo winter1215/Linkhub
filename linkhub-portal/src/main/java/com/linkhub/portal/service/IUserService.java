@@ -89,5 +89,7 @@ public interface IUserService extends IService<User> {
 
     List<UserInfoDto> getUserInfoList(UserIdsRequest userIdsRequest);
 
+    UserInfoDto getUserInfo(String userId);
+
     UserSettingVo setUserSettings(String userId, UserSettingsRequest userSettingsRequest);
 }

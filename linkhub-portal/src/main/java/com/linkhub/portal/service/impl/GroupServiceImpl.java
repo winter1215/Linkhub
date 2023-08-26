@@ -1,16 +1,14 @@
 package com.linkhub.portal.service.impl;
-import java.time.Instant;
-import java.time.LocalDateTime;
 import java.util.List;
 
 import cn.hutool.json.JSONUtil;
 import com.linkhub.common.enums.*;
 import com.linkhub.common.model.dto.group.*;
-import com.linkhub.common.model.dto.group.CreateGroupDto.Panel;
+
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
-import com.google.errorprone.annotations.Var;
+
 import com.linkhub.common.config.exception.GlobalException;
 import com.linkhub.common.mapper.GroupMemberMapper;
 import com.linkhub.common.mapper.GroupPanelMapper;
@@ -18,20 +16,16 @@ import com.linkhub.common.model.pojo.Group;
 import com.linkhub.common.mapper.GroupMapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.linkhub.common.model.pojo.GroupMember;
-import com.linkhub.common.model.vo.GroupInviteVo;
 import com.linkhub.common.model.vo.GroupVo;
 import com.linkhub.portal.im.util.IMUtil;
-import com.linkhub.portal.security.LinkhubUserDetails;
 import com.linkhub.common.model.pojo.GroupPanel;
 import com.linkhub.common.model.pojo.GroupRole;
-import com.linkhub.common.model.vo.GroupVo;
 import com.linkhub.portal.security.SecurityUtils;
 import com.linkhub.portal.service.IGroupMemberService;
 import com.linkhub.portal.service.IGroupPanelService;
 import com.linkhub.portal.service.IGroupRoleService;
 import com.linkhub.portal.service.IGroupService;
 import org.apache.commons.lang3.ObjectUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -291,91 +285,6 @@ public class GroupServiceImpl extends ServiceImpl<GroupMapper, Group> implements
         return null;
     }
 
-
-
-    @Override
-    public GroupInviteVo createGroupInvite(String userId, GroupInviteRequest groupInviteRequest) {
-        // 判空处理
-        if (ObjectUtils.isEmpty(groupInviteRequest)) {
-            throw new GlobalException(ErrorCode.PARAMS_ERROR);
-        }
-
-        String groupId = groupInviteRequest.getGroupId();
-        String inviteType = groupInviteRequest.getInviteType();
-
-        if (StringUtils.isEmpty(userId) || StringUtils.isEmpty(groupId) || StringUtils.isEmpty(inviteType)) {
-            throw new GlobalException(ErrorCode.PARAMS_ERROR);
-        }
-        // 校验权限
-        boolean hasNormalPermission = checkUserPermission(userId, groupId, GroupPermissionEnum.INVITE);
-        boolean hasUnlimitedPermission = checkUserPermission(userId, groupId, GroupPermissionEnum.UN_LIMITED_INVITE);
-
-        if ((inviteType.equals(GroupInviteEnum.NORMAL_INVITE.getMessage()) && !hasNormalPermission) ||
-                inviteType.equals(GroupInviteEnum.PERMANENT_INVITE.getMessage()) && !hasUnlimitedPermission) {
-            throw new GlobalException("没有创建邀请码权限", ErrorCode.NO_AUTH_ERROR.getCode());
-        }
-
-        // todo: 创建groupInvite表 然后直接插入数据
-        return null;
-    }
-
-    @Override
-    public int editGroupInvite(String userId, GroupEditRequest groupEditRequest) {
-        // 判空
-        if (ObjectUtils.isEmpty(groupEditRequest)) {
-            throw new GlobalException(ErrorCode.PARAMS_ERROR);
-        }
-
-        if (StringUtils.isEmpty(userId) ||
-                StringUtils.isEmpty(groupEditRequest.getGroupId()) ||
-                StringUtils.isEmpty(groupEditRequest.getCode())) {
-            throw new GlobalException(ErrorCode.PARAMS_ERROR);
-        }
-        String groupId = groupEditRequest.getGroupId();
-        String code = groupEditRequest.getCode();
-
-        // 校验权限
-        boolean hasEditPermission = checkUserPermission(userId, groupId, GroupPermissionEnum.EDIT_INVITE);
-        if (!hasEditPermission) {
-            throw new GlobalException("没有编辑邀请码权限", ErrorCode.NO_AUTH_ERROR.getCode());
-        }
-
-        // 设置expireAt和usageLimit
-        Long expireAt = groupEditRequest.getExpireAt();
-        // 从时间戳创建 Instant 对象
-        Instant instant = Instant.ofEpochMilli(expireAt);
-        // 转换为本地日期时间
-        LocalDateTime localDateTime = instant.atZone(ZoneId.systemDefault()).toLocalDateTime();
-        Integer usageLimit = groupEditRequest.getUsageLimit();
-
-        // todo: 创建update对象，设置过期时间 ，如果为空直接设置为空
-
-        return 0;
-    }
-
-    @Override
-    public GroupInviteVo getAllGroupInviteCode(String userId, String groupId) {
-        // 判空
-        if (StringUtils.isEmpty(userId) || StringUtils.isEmpty(groupId)) {
-            throw new GlobalException(ErrorCode.PARAMS_ERROR);
-        }
-        // 鉴权
-        boolean hasPermission = checkUserPermission(userId, groupId,
-                GroupPermissionEnum.MANAGE_INVITE);
-        if (!hasPermission) {
-            throw new GlobalException("没有查看权限", ErrorCode.NO_AUTH_ERROR.getCode());
-        }
-        // 查询返回
-        // todo: 通过groupId查询所有的GroupInvite
-        return null;
-    }
-
-    @Override
-    public GroupInviteVo findGroupInviteByCode(String code) {
-        // todo: 通过code直接查找返回
-        return null;
-    }
-
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void quitGroup(String groupId) {
@@ -573,9 +482,4 @@ public class GroupServiceImpl extends ServiceImpl<GroupMapper, Group> implements
         return groupPanelService.removeById(panelId);
     }
 
-
-    @Override
-    public void applyInvite(GroupInviteApplyRequest groupInviteApplyRequest) {
-        // todo: 需要配合joinGroup
-    }
 }
