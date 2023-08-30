@@ -31,4 +31,6 @@ public interface CommonConstants {
     int CONVERSE_MESSAGE_LIMIT = 50;
 
     Integer CONVERSE_NEARBY_MESSAGE_LIMIT = 5;
+
+    String SYSTEM_USERID = "000000000000000000000000";
 }

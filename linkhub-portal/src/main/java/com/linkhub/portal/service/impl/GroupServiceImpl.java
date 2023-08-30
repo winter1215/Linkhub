@@ -8,8 +8,11 @@ import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.linkhub.common.enums.*;
 import com.linkhub.common.model.dto.group.*;
+
+
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
+
 import com.linkhub.common.config.exception.GlobalException;
 import com.linkhub.common.mapper.GroupMemberMapper;
 import com.linkhub.common.mapper.GroupPanelMapper;
@@ -18,9 +21,9 @@ import com.linkhub.common.mapper.GroupMapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.linkhub.common.model.pojo.GroupMember;
 import com.linkhub.common.model.vo.GroupVo;
+import com.linkhub.portal.im.util.IMUtil;
 import com.linkhub.common.model.pojo.GroupPanel;
 import com.linkhub.common.model.pojo.GroupRole;
-import com.linkhub.portal.im.util.IMUtil;
 import com.linkhub.portal.security.SecurityUtils;
 import com.linkhub.portal.service.IGroupMemberService;
 import com.linkhub.portal.service.IGroupPanelService;
@@ -281,12 +284,6 @@ public class GroupServiceImpl extends ServiceImpl<GroupMapper, Group> implements
         // todo: featurePanelId
         roomIdsWithTextPanel.add(groupId);
         IMUtil.joinRoom(roomIdsWithTextPanel, userId);
-
-        return null;
-    }
-
-    @Override
-    public GroupVo createGroupInvite(String userId, GroupInviteRequest groupInviteRequest) {
 
         return null;
     }

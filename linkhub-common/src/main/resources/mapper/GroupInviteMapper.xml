@@ -8,7 +8,7 @@
         <result column="code" property="code" />
         <result column="creator" property="creator" />
         <result column="group_id" property="groupId" />
-        <result column="expireAt" property="expireat" />
+        <result column="expire_at" property="expireAt" />
         <result column="usage" property="usage" />
         <result column="create_at" property="createAt" />
         <result column="update_at" property="updateAt" />
@@ -16,7 +16,7 @@
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        id, code, creator, group_id, expireAt, usage, create_at, update_at
+        id, code, creator, group_id, expire_at, usage, create_at, update_at
     </sql>
 
 </mapper>

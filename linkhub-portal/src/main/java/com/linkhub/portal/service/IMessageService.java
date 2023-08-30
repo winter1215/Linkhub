@@ -60,4 +60,7 @@ public interface IMessageService extends IService<Message> {
     boolean removeReaction(ReactionDto reactionDto);
 
     void sendSysMessage(SendMsgDto sendMsgDto);
+
+
+    void addGroupSystemMessage(String groupId, String message);
 }

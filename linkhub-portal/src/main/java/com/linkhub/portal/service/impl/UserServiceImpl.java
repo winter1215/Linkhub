@@ -379,6 +379,19 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
     }
 
     @Override
+    public UserInfoDto getUserInfo(String userId) {
+        if (StringUtils.isEmpty(userId)) {
+            throw new GlobalException(ErrorCode.PARAMS_ERROR);
+        }
+        LambdaQueryWrapper<User> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(User::getId, userId);
+        User user = baseMapper.selectOne(wrapper);
+        UserInfoDto userInfoDto = new UserInfoDto();
+        BeanUtils.copyProperties(user, userInfoDto);
+        return userInfoDto;
+    }
+
+    @Override
     @Transactional(rollbackFor = Exception.class)
     public UserSettingVo setUserSettings(String userId, UserSettingsRequest userSettingsRequest) {
         // 判空
