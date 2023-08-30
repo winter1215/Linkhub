@@ -8,18 +8,14 @@
         <result column="user_id" property="userId" />
         <result column="type" property="type" />
         <result column="readed" property="readed" />
-        <result column="conserve_id" property="conserveId" />
-        <result column="message_id" property="messageId" />
-        <result column="message_author" property="messageAuthor" />
-        <result column="message_snippet" property="messageSnippet" />
-        <result column="message_plain_content" property="messagePlainContent" />
+        <result column="payload" property="payload" typeHandler="com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler" />
         <result column="create_at" property="createAt" />
         <result column="update_at" property="updateAt" />
     </resultMap>
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        id, user_id, type, readed, conserve_id, message_id, message_author, message_snippet, message_plain_content, create_at, update_at
+        id, user_id, type, readed, payload, create_at, update_at
     </sql>
 
 </mapper>

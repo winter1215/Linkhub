@@ -18,8 +18,10 @@ public enum ClientEventEnum {
     MESSAGE_UPDATE(1, "notify:chat.message.update"),
     MESSAGE_DELETE(2, "notify:chat.message.delete"),
     CONVERSE_UPDATEDM(3, "notify:chat.converse.updateDMConverse"),
-    GROUP_REMOVE(3, "notify:group.remove"),
-    GROUP_UPDATE_INFO(4, "notify:group.updateInfo");
+    GROUP_REMOVE(3, "notify:chat.group.remove"),
+    GROUP_UPDATE_INFO(4, "notify:chat.group.updateInfo"),
+    INBOX_APPEND(5,"notify:chat.inbox.append"),
+    INBOX_UPDATED(6, "notify:chat.inbox.updated");
 
     private final Integer code;
 

@@ -1,7 +1,6 @@
 package com.linkhub.portal.service.impl;
 
 import cn.hutool.json.JSONUtil;
-import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -86,7 +85,7 @@ public class MessageServiceImpl extends ServiceImpl<MessageMapper, Message> impl
         // 将消息 jsonify 后广播给房间的用户,
         IMUtil.notify(new String[]{converseId}, IMNotifyTypeEnum.ROOM_CAST, ClientEventEnum.MESSAGE_ADD, message);
         // 更新收件箱(@ sb)
-        iInboxService.insertMsgInbox(sendMsgDto);
+        iInboxService.asyncInsertMsgInbox(sendMsgDto);
     }
 
     @Override

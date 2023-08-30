@@ -30,6 +30,7 @@ import java.util.ArrayList;
 public class DefaultAuthListener implements AuthorizationListener {
     @Value("${jwt.tokenHead}")
     private String tokenHead;
+
     @Resource
     private UserDetailsService userDetailsService;
     @Resource
@@ -39,7 +40,6 @@ public class DefaultAuthListener implements AuthorizationListener {
 
     @Override
     public boolean isAuthorized(HandshakeData data) {
-        log.info("auth");
         String token = data.getSingleUrlParam(TOKEN_PARAM);
         // 如果未传递 accessToken 或者没有带头
         if (StringUtils.isEmpty(token) || !token.startsWith(tokenHead)) {

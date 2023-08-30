@@ -146,7 +146,6 @@ public class GroupServiceImpl extends ServiceImpl<GroupMapper, Group> implements
         Map<String, List<GroupRole>> groupIdRolesMap = roles.stream()
                 .collect(Collectors.groupingBy(GroupRole::getGroupId));
         // 组装
-
         groups.forEach(group -> {
             String groupId = group.getId();
             GroupVo groupVo = new GroupVo();

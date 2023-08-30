@@ -40,6 +40,7 @@ public class GroupController {
         GroupVo groupVo = groupService.createGroup(createGroupDto);
         return R.ok().setData(groupVo);
     }
+
     @PostMapping("updateGroupField")
     public R updateGroupField(@RequestBody UpdateGroupFieldDto updateGroupFieldDto) {
         groupService.updateGroupField(updateGroupFieldDto);
@@ -95,6 +96,7 @@ public class GroupController {
     public R createGroupRole(@Valid @RequestBody CreateGroupRoleDto createGroupRoleDto) {
         return R.ok().setData(groupService.createGroupRole(createGroupRoleDto));
     }
+
     @PostMapping("deleteGroupRole")
     public R deleteGroupRole(@Valid @RequestBody DeleteGroupRoleDto deleteGroupRoleDto) {
         return R.ok().setData(groupService.deleteGroupRole(deleteGroupRoleDto));
@@ -119,7 +121,6 @@ public class GroupController {
     public R deleteGroupMember(@Valid @RequestBody DeleteGroupMemberDto deleteGroupMemberDto) {
         return R.ok().setData(groupService.deleteGroupMember(deleteGroupMemberDto));
     }
-
 
 
 }

@@ -1,12 +1,11 @@
 package com.linkhub.common.model.pojo;
 
-import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.*;
+
 import java.time.LocalDateTime;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.FieldFill;
-import com.baomidou.mybatisplus.annotation.TableField;
 import java.io.Serializable;
 
+import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import com.linkhub.common.enums.InboxTypeEnum;
 import com.linkhub.common.model.dto.message.SendMsgDto;
 import io.swagger.annotations.ApiModel;
@@ -26,6 +25,7 @@ import org.apache.commons.lang3.ObjectUtils;
 @Data
 @EqualsAndHashCode(callSuper = false)
 @ApiModel(value="Inbox对象", description="收件箱")
+@TableName(autoResultMap = true)
 public class Inbox implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -35,21 +35,12 @@ public class Inbox implements Serializable {
 
     private String userId;
 
-    @ApiModelProperty(value = "单人会话:0, 群组: 1")
-    private Integer type;
+    private String type;
 
     private Boolean readed;
 
-    private String conserveId;
-
-    private String messageId;
-
-    private String messageAuthor;
-
-    private String messageSnippet;
-
-    @ApiModelProperty(value = "回复纯文本")
-    private String messagePlainContent;
+    @TableField(typeHandler = JacksonTypeHandler.class)
+    private Payload payload;
 
     @TableField(fill = FieldFill.INSERT)
     private LocalDateTime createAt;
@@ -58,22 +49,32 @@ public class Inbox implements Serializable {
     private LocalDateTime updateAt;
 
     public static Inbox sendMsgDtoConvertDomain(SendMsgDto sendMsgDto, String mention) {
-        InboxTypeEnum typeEnum =  ObjectUtils.isEmpty(sendMsgDto.getGroupId())
-                ? InboxTypeEnum.DM
-                : InboxTypeEnum.GROUP_MESSAGE;
-
         Inbox inbox = new Inbox();
         inbox.setUserId(mention);
-        inbox.setType(typeEnum.getCode());
-        if (typeEnum == InboxTypeEnum.DM) {
-            inbox.setConserveId(sendMsgDto.getConverseId());
-        } else if (typeEnum == InboxTypeEnum.GROUP_MESSAGE){
-            inbox.setConserveId(sendMsgDto.getGroupId());
+        inbox.setType(InboxTypeEnum.MESSAGE.getMessage());
+        if (ObjectUtils.isNotEmpty(sendMsgDto.getGroupId())) {
+            inbox.getPayload().setGroupId(sendMsgDto.getGroupId());
+        } else {
+            inbox.getPayload().setConserveId(sendMsgDto.getConverseId());
         }
-        inbox.setMessageId(sendMsgDto.getMeta().getReply().get_id());
-        inbox.setMessageAuthor(sendMsgDto.getMeta().getReply().getAuthor());
-        inbox.setMessageSnippet(sendMsgDto.getMeta().getReply().getContent());
-        inbox.setMessagePlainContent(sendMsgDto.getPlain());
+        inbox.getPayload().setMessageId(sendMsgDto.getMeta().getReply().get_id());
+        inbox.getPayload().setMessageAuthor(sendMsgDto.getMeta().getReply().getAuthor());
+        inbox.getPayload().setMessageSnippet(sendMsgDto.getMeta().getReply().getContent());
+        inbox.getPayload().setMessagePlainContent(sendMsgDto.getPlain());
         return inbox;
+    }
+
+    @Data
+    public static class Payload {
+        private String conserveId;
+        private String groupId;
+
+        private String messageId;
+
+        private String messageAuthor;
+
+        private String messageSnippet;
+        @ApiModelProperty(value = "回复纯文本")
+        private String messagePlainContent;
     }
 }

@@ -14,8 +14,7 @@ public enum InboxTypeEnum {
     /**
     * 个人消息
     */
-    DM(0, "个人消息"),
-    GROUP_MESSAGE(1, "群组消息");
+    MESSAGE(0, "message");
     private final Integer code;
 
     /**
