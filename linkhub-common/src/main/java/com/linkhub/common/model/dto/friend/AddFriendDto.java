@@ -1,6 +1,8 @@
-package com.linkhub.common.model.dto.user;
+package com.linkhub.common.model.dto.friend;
 
 import lombok.Data;
+
+import javax.validation.constraints.NotNull;
 
 /**
  * @author LinkCastling
@@ -8,14 +10,8 @@ import lombok.Data;
  */
 @Data
 public class AddFriendDto {
-
-    // 好友请求记录的Id
-    private String id;
-
-    // 发起添加的人
-    private String from;
-
     // 目标
+    @NotNull
     private String to;
 
 }

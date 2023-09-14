@@ -74,6 +74,8 @@ public class Message implements Serializable {
             message.setReplyAuthor(sendMsgDto.getMeta().getReply().getAuthor());
         }
         message.setGroupId(sendMsgDto.getGroupId());
+        message.setCreateAt(LocalDateTime.now());
+        message.setUpdateAt(LocalDateTime.now());
         return message;
     }
 }

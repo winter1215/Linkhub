@@ -26,6 +26,10 @@ public class IMUtil {
     private static RedisCache redisCache;
     private static SocketIOServer server;
 
+    //public static Map anal() {
+    //    server.getRoomOperations()
+    //}
+
     public IMUtil(SocketIOServer server, RedisCache redisCache) {
         IMUtil.server = server;
         IMUtil.redisCache = redisCache;

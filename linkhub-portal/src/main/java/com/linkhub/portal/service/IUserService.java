@@ -6,6 +6,7 @@ import com.linkhub.common.model.pojo.User;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.linkhub.common.model.pojo.UserSetting;
 import com.linkhub.common.model.vo.UserSettingVo;
+import com.linkhub.common.model.vo.UserVo;
 import com.linkhub.common.utils.R;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -20,13 +21,13 @@ import java.util.List;
  * @since 2022-11-20
  */
 public interface IUserService extends IService<User> {
-    int register(RegisterUser registerUser);
+    UserVo register(RegisterUser registerUser);
 
     /**
      * 用户登录
      * @return 登录成功返回token失败抛出异常交于GlobalExceptionHandler统一发送error消息
      */
-    String login(String email, String password);
+    UserVo login(String email, String password);
 
     /**
      * 通过用户名获取user对象(实现UserDetails的对象)

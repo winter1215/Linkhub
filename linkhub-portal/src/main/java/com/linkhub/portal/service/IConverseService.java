@@ -29,4 +29,6 @@ public interface IConverseService extends IService<Converse> {
     ConverseVo appendDMConverseMembers(User user, AppendDMConverseMemberRequest appendMemberRequest);
 
     ConverseVo findConverseInfo(String userId, String converseId);
+
+    Set<String> getDMConverseIds(String userId);
 }

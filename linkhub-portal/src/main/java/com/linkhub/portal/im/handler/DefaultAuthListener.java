@@ -19,6 +19,7 @@ import org.springframework.stereotype.Component;
 import javax.annotation.Resource;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.function.Function;
 
 /**
  * ws 连接建立的鉴权
@@ -45,7 +46,7 @@ public class DefaultAuthListener implements AuthorizationListener {
         if (StringUtils.isEmpty(token) || !token.startsWith(tokenHead)) {
             return false;
         }
-
+        
         token = token.substring(tokenHead.length());
         String username = tokenUtil.getUsernameFromToken(token);
         // context 绑定了一个线程(如果当前线程首次请求没有 set userDetail, 则 set, 方便后续请求调用)

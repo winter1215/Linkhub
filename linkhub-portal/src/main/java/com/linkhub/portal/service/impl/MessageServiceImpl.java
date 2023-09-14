@@ -7,7 +7,6 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.linkhub.common.config.exception.GlobalException;
 import com.linkhub.common.enums.*;
 import com.linkhub.common.mapper.MessageMapper;
-import com.linkhub.common.model.dto.message.FetchConverseMessageDto;
 import com.linkhub.common.model.dto.message.FetchNearbyMessageDto;
 import com.linkhub.common.model.dto.message.ReactionDto;
 import com.linkhub.common.model.dto.message.SendMsgDto;
@@ -94,10 +93,7 @@ public class MessageServiceImpl extends ServiceImpl<MessageMapper, Message> impl
     }
 
     @Override
-    public List<MessageVo> fetchConverseMessage(FetchConverseMessageDto fetchConverseMessageDto) {
-        String converseId = fetchConverseMessageDto.getConverseId();
-        Long startId = fetchConverseMessageDto.getStartId();
-
+    public List<MessageVo> fetchConverseMessage(String converseId, Long startId) {
         syncMessageBuffer();
         return baseMapper.fetchConverseMessage(converseId, startId, CommonConstants.CONVERSE_MESSAGE_LIMIT);
     }

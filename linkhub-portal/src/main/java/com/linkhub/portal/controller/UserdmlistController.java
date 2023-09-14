@@ -28,7 +28,7 @@ import java.util.Map;
  * @since 2023-08-08
  */
 @RestController
-@RequestMapping("/userdmlist")
+@RequestMapping("user/dmlist")
 public class UserdmlistController {
 
     @Autowired

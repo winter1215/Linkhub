@@ -1,5 +1,7 @@
 package com.linkhub.portal.controller;
 
+import cn.hutool.log.Log;
+import com.linkhub.common.model.dto.user.UserIdsDto;
 import com.linkhub.common.utils.R;
 import com.linkhub.portal.im.util.IMUtil;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -17,7 +19,8 @@ import java.util.List;
 @RequestMapping("/gateway")
 public class IndexController {
     @PostMapping("checkUserOnline")
-    public R checkUserOnline(@RequestBody List<String> userIds) {
-        return R.ok().setData(IMUtil.checkUserOnline(userIds));
+    public R checkUserOnline(@RequestBody UserIdsDto userIdsDto) {
+        System.out.println("aaa");
+        return R.ok().setData(IMUtil.checkUserOnline(userIdsDto.getUserIds()));
     }
 }

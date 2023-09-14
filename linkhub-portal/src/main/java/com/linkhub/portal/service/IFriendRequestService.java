@@ -1,5 +1,6 @@
 package com.linkhub.portal.service;
 
+import com.linkhub.common.model.dto.friend.AddFriendDto;
 import com.linkhub.common.model.dto.friend.OptFriendRequest;
 import com.linkhub.common.model.pojo.FriendRequest;
 import com.baomidou.mybatisplus.extension.service.IService;
@@ -17,9 +18,9 @@ import java.util.List;
  */
 public interface IFriendRequestService extends IService<FriendRequest> {
 
-    FriendRequest addFriend(FriendRequest friendRequest);
+    FriendRequest addFriend(AddFriendDto addFriendDto);
 
-    List<FriendRequest> allRelated(User user);
+    List<FriendRequest> allRelated(String userId);
 
     int accept(String userId, OptFriendRequest optFriendRequest);
 

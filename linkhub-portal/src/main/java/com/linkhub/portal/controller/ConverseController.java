@@ -23,7 +23,7 @@ import javax.validation.constraints.NotNull;
  * @since 2023-08-13
  */
 @RestController
-@RequestMapping("/converse")
+@RequestMapping("chat/converse")
 public class ConverseController {
 
     @Autowired

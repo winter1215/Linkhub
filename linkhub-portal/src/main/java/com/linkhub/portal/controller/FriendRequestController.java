@@ -1,6 +1,7 @@
 package com.linkhub.portal.controller;
 
 
+import com.linkhub.common.model.dto.friend.AddFriendDto;
 import com.linkhub.common.model.dto.friend.OptFriendRequest;
 import com.linkhub.common.model.pojo.FriendRequest;
 import com.linkhub.common.model.pojo.User;
@@ -36,9 +37,8 @@ public class FriendRequestController {
     IFriendRequestService friendRequestService;
     @ApiOperation("添加好友")
     @PostMapping("/add")
-    public R addFriend(@RequestBody FriendRequest friendRequest) {
-        friendRequest.setFrom(SecurityUtils.getLoginUserId());
-        FriendRequest addFriend = friendRequestService.addFriend(friendRequest);
+    public R addFriend(@RequestBody AddFriendDto addFriendDto) {
+        FriendRequest addFriend = friendRequestService.addFriend(addFriendDto);
         return R.ok()
                 .setData(addFriend);
     }
@@ -46,8 +46,8 @@ public class FriendRequestController {
     @ApiOperation("所有与自己相关的好友请求")
     @PostMapping("/allRelated")
     public R allRelated() {
-        User user = SecurityUtils.getLoginObj();
-        List<FriendRequest> friendRequestList = friendRequestService.allRelated(user);
+        String userId = SecurityUtils.getLoginUserId();
+        List<FriendRequest> friendRequestList = friendRequestService.allRelated(userId);
         return R.ok()
                 .setData(friendRequestList);
     }

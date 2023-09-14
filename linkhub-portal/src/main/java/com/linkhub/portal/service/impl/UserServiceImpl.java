@@ -15,6 +15,7 @@ import com.linkhub.common.model.pojo.User;
 import com.linkhub.common.mapper.UserMapper;
 import com.linkhub.common.model.pojo.UserSetting;
 import com.linkhub.common.model.vo.UserSettingVo;
+import com.linkhub.common.model.vo.UserVo;
 import com.linkhub.common.utils.R;
 import com.linkhub.portal.security.LinkhubUserDetails;
 import com.linkhub.portal.service.IUserCacheService;
@@ -70,11 +71,11 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
 
     @Value("${jwt.tokenHead}")
     private String tokenHead;
-    private String emailSuffix = ".temporary@linkhub.com";
+    private static final String EMAIL_SUFFIX = ".temporary@linkhub.com";
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public int register(RegisterUser registerUser) {
+    public UserVo register(RegisterUser registerUser) {
         String nickname = registerUser.getNickname();
         String email = registerUser.getEmail();
 
@@ -83,7 +84,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         if (ObjectUtils.isNotEmpty(user)) {
             throw new GlobalException(ErrorCode.PARAMS_ERROR, "该邮箱已被注册");
         }
-
         // todo: verify mail
         User newUser = new User();
         String discriminator = generateDiscriminator(nickname, 10);
@@ -95,7 +95,11 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         // insert userSetting record
         UserSetting userSetting = new UserSetting();
         userSetting.setUserId(newUser.getId());
-        return userSettingMapper.insert(userSetting);
+        userSettingMapper.insert(userSetting);
+
+        UserVo userVo = new UserVo();
+        BeanUtils.copyProperties(newUser, userVo);
+        return userVo;
     }
 
 
@@ -130,15 +134,22 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
      *
      */
     @Override
-    public String login(String email, String password) {
+    public UserVo login(String email, String password) {
         try {
             UserDetails userDetails = loadUserByUsername(email);
+            LinkhubUserDetails linkhubUserDetails = (LinkhubUserDetails)userDetails;
+            UserVo userVo = new UserVo();
+            BeanUtils.copyProperties(linkhubUserDetails.getUser(), userVo);
+
             if(!passwordEncoder.matches(password,userDetails.getPassword())){
                 throw new BadCredentialsException("邮箱或密码不正确");
             }
             UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
             SecurityContextHolder.getContext().setAuthentication(authToken);
-            return jwtTokenUtil.generateToken(userDetails);
+
+            String token = tokenHead + jwtTokenUtil.generateToken(userDetails);
+            userVo.setToken(token);
+            return userVo;
         }catch (AuthenticationException e){
             throw new GlobalException(ErrorCode.USERNAME_PASSWORD_ERROR);
         }
@@ -260,7 +271,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         String discriminator = generateDiscriminator(nickname, 10);
         temporaryUser.setDiscriminator(discriminator);
         // 2.创建随机密码和随机邮箱
-        String email = RandomStringUtils.randomAlphanumeric(10) + emailSuffix;
+        String email = RandomStringUtils.randomAlphanumeric(10) + EMAIL_SUFFIX;
         temporaryUser.setEmail(email);
         String password = passwordEncoder.encode(RandomStringUtils.randomAlphanumeric(10));
         temporaryUser.setPassword(password);
@@ -344,6 +355,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         wrapper.eq(User::getNickname, parts[0])
                 .eq(User::getDiscriminator, parts[1]);
         User user = baseMapper.selectOne(wrapper);
+        if (user == null) {
+            throw new GlobalException(ErrorCode.OPERATION_ERROR, "找不到该用户");
+        }
         UserInfoDto userInfoDto = new UserInfoDto();
         BeanUtils.copyProperties(user, userInfoDto);
         return userInfoDto;

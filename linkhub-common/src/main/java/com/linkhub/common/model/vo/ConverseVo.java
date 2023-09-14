@@ -11,7 +11,7 @@ import java.util.List;
  */
 @Data
 public class ConverseVo {
-    private String _id;
+    private String id;
 
     private String type;
 

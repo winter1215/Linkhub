@@ -18,6 +18,13 @@ public interface MessageMapper extends BaseMapper<Message> {
 
     MessageVo findMsgVoById(Long id);
 
+    /**
+     * startId 为空自动忽略
+     * @return: java.util.List<com.linkhub.common.model.vo.MessageVo>
+     * @author: winter
+     * @date: 2023/9/13 下午5:34
+     * @description:
+     */
     List<MessageVo> fetchConverseMessage(String converseId, Long startId, int limit);
 
     List<MessageVo> fetchNearbyMessage(String converseId, Long messageId, Integer num);

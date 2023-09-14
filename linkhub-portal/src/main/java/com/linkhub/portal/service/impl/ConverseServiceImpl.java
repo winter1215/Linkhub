@@ -18,6 +18,7 @@ import com.linkhub.common.mapper.ConverseMapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.linkhub.common.model.pojo.GroupMember;
 import com.linkhub.common.model.pojo.User;
+import com.linkhub.common.model.pojo.Userdmlist;
 import com.linkhub.common.model.vo.ConverseVo;
 import com.linkhub.portal.im.util.IMUtil;
 import com.linkhub.portal.security.LinkhubUserDetails;
@@ -68,6 +69,7 @@ public class ConverseServiceImpl extends ServiceImpl<ConverseMapper, Converse> i
                 new LambdaQueryWrapper<Converse>()
                         .eq(Converse::getMember, userId)
                         .select(Converse::getConverseId));
+
         List<String> dmConverseIds = converses.stream().map(Converse::getConverseId).collect(Collectors.toList());
 
         List<GroupMember> groups = groupMemberMapper.selectList(
@@ -121,7 +123,7 @@ public class ConverseServiceImpl extends ServiceImpl<ConverseMapper, Converse> i
         this.saveBatch(converseList);
 
         ConverseVo converseVo = new ConverseVo();
-        converseVo.set_id(converseId);
+        converseVo.setId(converseId);
         converseVo.setType(type);
         converseVo.setMembers(new ArrayList<>(participantList));
         converseVo.setCreatedAt(converseList.get(0).getCreateAt());
@@ -204,7 +206,7 @@ public class ConverseServiceImpl extends ServiceImpl<ConverseMapper, Converse> i
                 .map(Converse::getMember)
                 .collect(Collectors.toList());
         ConverseVo converseVo = new ConverseVo();
-        converseVo.set_id(converseId);
+        converseVo.setId(converseId);
         converseVo.setType(ConverseTypeEnum.CONVERSE_TYPE_MULTI.getMessage());
         converseVo.setMembers(members);
         // 广播更新会话列表
@@ -262,11 +264,17 @@ public class ConverseServiceImpl extends ServiceImpl<ConverseMapper, Converse> i
 
         List<String> members = converseList.stream().map(Converse::getMember).collect(Collectors.toList());
         ConverseVo converseVo = new ConverseVo();
-        converseVo.set_id(converseId);
+        converseVo.setId(converseId);
         converseVo.setType(converseList.get(0).getType());
         converseVo.setMembers(members);
         converseVo.setCreatedAt(converseList.get(0).getCreateAt());
         converseVo.setUpdatedAt(converseList.get(0).getUpdateAt());
         return converseVo;
+    }
+
+    @Override
+    public Set<String> getDMConverseIds(String userId) {
+        List<Userdmlist> userDMLists = userdmlistService.list(new LambdaQueryWrapper<Userdmlist>().eq(Userdmlist::getUserId, userId));
+        return userDMLists.stream().map(Userdmlist::getConverseId).collect(Collectors.toSet());
     }
 }

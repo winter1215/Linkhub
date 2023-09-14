@@ -21,7 +21,8 @@ public enum ClientEventEnum {
     GROUP_REMOVE(3, "notify:chat.group.remove"),
     GROUP_UPDATE_INFO(4, "notify:chat.group.updateInfo"),
     INBOX_APPEND(5,"notify:chat.inbox.append"),
-    INBOX_UPDATED(6, "notify:chat.inbox.updated");
+    INBOX_UPDATED(6, "notify:chat.inbox.updated"),
+    ADD_FRIEND_REQUEST(7, "notify:friend.request.add");
 
     private final Integer code;
 

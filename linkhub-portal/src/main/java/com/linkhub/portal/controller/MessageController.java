@@ -20,7 +20,7 @@ import java.util.List;
  * @since 2023-08-08
  */
 @RestController
-@RequestMapping("/message")
+@RequestMapping("chat/message")
 @Slf4j
 public class MessageController {
     @Resource
@@ -32,9 +32,9 @@ public class MessageController {
         return R.ok();
     }
 
-    @PostMapping("fetchConverseMessage")
-    public R fetchConverseMessage(@RequestBody FetchConverseMessageDto fetchConverseMessageDto) {
-        List<MessageVo> messages = messageService.fetchConverseMessage(fetchConverseMessageDto);
+    @GetMapping("fetchConverseMessage")
+    public R fetchConverseMessage(@RequestParam String converseId, Long startId) {
+        List<MessageVo> messages = messageService.fetchConverseMessage(converseId, startId);
         return R.ok().setData(messages);
     }
 

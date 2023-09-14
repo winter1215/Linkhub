@@ -1,6 +1,11 @@
 package com.linkhub.common.model.vo;
 
+import com.baomidou.mybatisplus.annotation.FieldFill;
+import com.baomidou.mybatisplus.annotation.TableField;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+
+import java.time.LocalDateTime;
 
 /**
  * @author winter
@@ -8,8 +13,26 @@ import lombok.Data;
  */
 @Data
 public class UserVo {
-    Long id;
-    String nickname;
-    String email;
-    String avatar;
+    private String id;
+
+    private String token;
+    private String email;
+
+    private String nickname;
+
+    private Boolean temporary;
+
+    private String avatar;
+
+    private String type;
+
+    private Boolean emailVerified;
+
+    private Boolean banned;
+
+    private String discriminator;
+
+    private LocalDateTime createAt;
+
+    private LocalDateTime updateAt;
 }

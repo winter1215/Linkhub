@@ -31,7 +31,7 @@ public interface IMessageService extends IService<Message> {
      * @date: 2023/8/16 上午12:22
      * @description:
      */
-    List<MessageVo> fetchConverseMessage(FetchConverseMessageDto fetchConverseMessageDto);
+    List<MessageVo> fetchConverseMessage(String converseId, Long startId);
 
     /**
      * 拉取某条消息前后的数据

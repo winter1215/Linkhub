@@ -52,8 +52,8 @@ public class UserController {
     @PostMapping("/register")
     @ApiOperation("用户注册")
     public R register(@RequestBody @Validated RegisterUser registerUser) {
-        int flag = userService.register(registerUser);
-        return flag > 0 ? R.ok().message("注册成功") : R.error().message("注册失败");
+        UserVo userVo = userService.register(registerUser);
+        return R.ok().message("注册成功").setData(userVo);
     }
 
     @GetMapping("/code/{mail}")
@@ -72,9 +72,8 @@ public class UserController {
     @ApiOperation("用户登录")
     @PostMapping("/login")
     public R login(@RequestBody @Validated LoginForm loginForm){
-        String token = userService.login(loginForm.getEmail(), loginForm.getPassword());
-        return R.ok()
-                .data("token",tokenHead + token);
+        UserVo userVo = userService.login(loginForm.getEmail(), loginForm.getPassword());
+        return R.ok().setData(userVo);
     }
 
     @ApiOperation("忘记密码")
